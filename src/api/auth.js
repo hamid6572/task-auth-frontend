@@ -1,19 +1,28 @@
-const BASE_URL = 'http://localhost:8080'
+import { gql } from '@apollo/client'
 
-export const LoginAPI = userData =>
-  fetch(`${BASE_URL}/auth/login`, {
-    method: 'POST',
-    body: JSON.stringify(userData),
-    headers: {
-      'Content-Type': 'application/json'
+export const SignupMutation = gql`
+  mutation Register($email: String!, $firstName: String!, $lastName: String!, $password: String!) {
+    register(
+      createUser: { email: $email, firstName: $firstName, lastName: $lastName, password: $password }
+    ) {
+      token
     }
-  })
-
-export const SignupAPI = userData =>
-  fetch(`${BASE_URL}/auth/signup`, {
-    method: 'POST',
-    body: JSON.stringify(userData),
-    headers: {
-      'Content-type': 'application/json'
+  }
+`
+export const LoginMutation = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(loginData: { email: $email, password: $password }) {
+      token
     }
-  })
+  }
+`
+export const UserQuery = gql`
+  query GetUser($email: String!) {
+    user(email: $email) {
+      firstName
+      posts {
+        title
+      }
+    }
+  }
+`
