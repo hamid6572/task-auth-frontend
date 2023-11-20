@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 
 import { EditPost, CreatePost, Drafts, Dashboard, NotFound, Authentication } from '../pages'
-import ProtectedRoute from './protected.routes'
+//import ProtectedRoute from './protected.routes'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../App.css'

@@ -1,12 +1,16 @@
 import React from 'react'
-import { TextField, Button, Box, Typography } from '@mui/material'
+import { TextField, Button, Box } from '@mui/material'
 
 const Signup = props => {
   const emailRef = React.useRef('')
   const passwordRef = React.useRef('')
+  const firstNameRef = React.useRef('')
+  const lastNameRef = React.useRef('')
 
   const signupHandler = () => {
     const userData = {
+      firstName: firstNameRef.current.value,
+      lastName: lastNameRef.current.value,
       email: emailRef.current.value,
       password: passwordRef.current.value
     }
@@ -15,7 +19,25 @@ const Signup = props => {
 
   return (
     <Box sx={{ maxWidth: 300, margin: 'auto' }}>
-      <Typography variant='h6'>Sign Up</Typography>
+      <TextField
+        id='signupfirstname'
+        label='First Name'
+        type='text'
+        inputRef={firstNameRef}
+        fullWidth
+        variant='outlined'
+        margin='normal'
+      />
+      <TextField
+        id='signuplastname'
+        label='Last Name'
+        type='text'
+        inputRef={lastNameRef}
+        fullWidth
+        variant='outlined'
+        margin='normal'
+      />
+
       <TextField
         id='loginemail'
         label='Email'

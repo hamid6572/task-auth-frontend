@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Button, Box, Typography } from '@mui/material'
+import { TextField, Button, Box } from '@mui/material'
 
 const Login = props => {
   const emailRef = React.useRef('')
@@ -15,7 +15,6 @@ const Login = props => {
 
   return (
     <Box sx={{ maxWidth: 300, margin: 'auto' }}>
-      <Typography variant='h6'>Sign In</Typography>
       <TextField
         id='loginemail'
         label='Email'
