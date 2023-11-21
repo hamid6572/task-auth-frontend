@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { AppBar, Toolbar, Typography, Box } from '@mui/material'
 
 const MainNav = () => {
   const signoutHandler = () => {
@@ -7,29 +8,26 @@ const MainNav = () => {
   }
 
   return (
-    <nav className='navbar navbar-expand-lg navbar-light bg-light justify-content-between'>
-      <Link className='navbar-brand mx-3' to='/posts'>
-        Posts
-      </Link>
-
-      <Link className='navbar-brand' to='/drafts'>
-        Drafts
-      </Link>
-
-      <div className='collapse navbar-collapse' id='navbarSupportedContent'>
-        <ul className='navbar-nav mr-auto'>
-          <li className='nav-item active'>
-            <Link className='nav-link' to={`/createPost`}>
-              Create Post
-            </Link>
-          </li>
-        </ul>
-        <ul className='navbar-nav mr-auto'></ul>
-      </div>
-      <Link className='nav-link btn btn-outline-success mx-3' onClick={signoutHandler} to='/'>
-        Signout
-      </Link>
-    </nav>
+    <AppBar position='static'>
+      <Toolbar>
+        <Box sx={{ marginRight: 2 }}>
+          <Typography variant='h6' component={Link} to='/posts'>
+            Posts
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant='h6' component={Link} to='/createPost'>
+            Create Post
+          </Typography>
+        </Box>
+        <Typography sx={{ flexGrow: 1 }} />
+        <Typography variant='h6'>
+          <Link to='/' onClick={signoutHandler}>
+            Signout
+          </Link>
+        </Typography>
+      </Toolbar>
+    </AppBar>
   )
 }
 
