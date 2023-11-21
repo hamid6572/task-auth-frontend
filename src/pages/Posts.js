@@ -1,65 +1,78 @@
 import { useEffect, useState } from 'react'
+import { Typography, Snackbar, Alert } from '@mui/material'
+import { useLazyQuery } from '@apollo/client'
 
-import { AllPostsAPI, DeletePostAPI } from '../api/posts'
+import { GetPostsQuery } from '../api/posts'
 import PostsList from '../components/Posts/PostsList'
-import { Toastcontainer, ToastError } from '../tools/toast'
 
 const Posts = () => {
   const [posts, setPosts] = useState([])
-  const err = new Error()
+  const [getPosts] = useLazyQuery(GetPostsQuery)
+  const [error, setError] = useState(null)
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setError(null)
+  }
 
   useEffect(() => {
-    AllPostsAPI()
-      .then(res => {
-        err.status = res.status
-        return res.json()
-      })
-      .then(data => {
-        if (err.status !== 200) {
-          throw new Error(data.message)
+    async function fetchData() {
+      try {
+        const { data, error } = await getPosts()
+        if (error) throw error
+        console.log(data)
+        if (data.listPosts) {
+          setPosts(data.listPosts)
         }
-        setPosts(data.posts)
-      })
-      .catch(err => {
-        ToastError(err)
-      })
+      } catch (err) {
+        setError(err.message || 'An error occurred')
+      }
+    }
+    fetchData()
     // eslint-disable-next-line
   }, [])
 
-  const resetPosts = id => {
-    let renewdPosts = posts.filter(post => parseInt(post.id) !== parseInt(id))
-    setPosts(renewdPosts)
-  }
+  // const resetPosts = id => {
+  //   let renewdPosts = posts.filter(post => parseInt(post.id) !== parseInt(id))
+  //   setPosts(renewdPosts)
+  // }
 
   const deleteHandeler = id => {
-    const err = new Error()
-
-    DeletePostAPI(id)
-      .then(res => {
-        err.status = res.status
-        return res.json()
-      })
-      .then(data => {
-        if (err.status !== 200) {
-          throw new Error(data.message)
-        }
-        resetPosts(id)
-      })
-      .catch(err => {
-        ToastError(err)
-      })
+    //   const err = new Error()
+    //   DeletePostAPI(id)
+    //     .then(res => {
+    //       err.status = res.status
+    //       return res.json()
+    //     })
+    //     .then(data => {
+    //       if (err.status !== 200) {
+    //         throw new Error(data.message)
+    //       }
+    //       resetPosts(id)
+    //     })
+    //     .catch(err => {
+    //       ToastError(err)
+    //     })
   }
 
   return (
     <div>
       {posts.length === 0 ? (
-        <p className='text-center h1 my-3 '>No Posts Available</p>
+        <Typography variant='h4' align='center' gutterBottom>
+          No Posts Available
+        </Typography>
       ) : (
         <div>
           <PostsList posts={posts} deleteHandeler={deleteHandeler} />
-          <Toastcontainer />
         </div>
       )}
+      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity='error'>
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

@@ -27,9 +27,11 @@ const Authentication = () => {
         variables: { ...userData }
       })
       if (error) throw error
-
+      console.log(data)
       if (data?.login.token) {
         localStorage.setItem('token', data.login.token)
+        localStorage.setItem('userId', data.login.user.id)
+
         navigate('Dashboard')
       }
     } catch (err) {
@@ -48,6 +50,8 @@ const Authentication = () => {
 
       if (data?.register.token) {
         localStorage.setItem('token', data.register.token)
+        localStorage.setItem('userId', data.register.user.id)
+
         navigate('Dashboard')
       }
     } catch (err) {

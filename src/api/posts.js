@@ -58,3 +58,81 @@ export const DeletePostAPI = id =>
       'x-access-token': localStorage.getItem('token')
     }
   })
+
+import { gql } from '@apollo/client'
+
+export const CreatePostMutation = gql`
+  mutation CreatePost($input: PostInput!) {
+    createPost(data: $input) {
+      message
+    }
+  }
+`
+
+export const GetPostsQuery = gql`
+  query {
+    listPosts {
+      id
+      title
+      content
+      user {
+        id
+        firstName
+      }
+      comments {
+        text
+      }
+    }
+  }
+`
+
+export const GlobalSearchQuery = gql`
+  query Search($input: String!) {
+    search(input: $input) {
+      user {
+        lastName
+        firstName
+        id
+      }
+      comments {
+        id
+        text
+      }
+      id
+      title
+      content
+    }
+  }
+`
+
+export const getPostQuery = gql`
+  query GetPost($id: ID!) {
+    getPost(id: $id) {
+      title
+      content
+      user {
+        firstName
+      }
+      comments {
+        id
+        text
+      }
+    }
+  }
+`
+
+export const EditPostMutation = gql`
+  mutation UpdatePost($id: ID!, $input: PostInput!) {
+    updatePost(id: $id, data: $input) {
+      message
+    }
+  }
+`
+
+export const DeletePostMutation = gql`
+  mutation DeletePost($id: ID!) {
+    deletePost(id: $id) {
+      message
+    }
+  }
+`
