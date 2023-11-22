@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material'
+
 import { CreatePostMutation } from '../api/posts'
 import Layout from '../components/Layout/Layout'
 import { Toastcontainer } from '../tools/toast'
@@ -26,7 +27,6 @@ const CreatePost = () => {
         variables: { input: { ...post } }
       })
       if (error) throw error
-      console.log(data)
       if (data?.createPost.message) {
         setAlert(data?.createPost.message)
         setTimeout(() => {

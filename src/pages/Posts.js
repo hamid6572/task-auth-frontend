@@ -22,7 +22,6 @@ const Posts = () => {
       try {
         const { data, error } = await getPosts()
         if (error) throw error
-        console.log(data)
         if (data.listPosts) {
           setPosts(data.listPosts)
         }

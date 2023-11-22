@@ -5,12 +5,13 @@ import { useLazyQuery } from '@apollo/client'
 
 import CommentList from '../Comments/CommentList'
 import { GetCommentsQuery } from '../../api/comments'
+import AddComment from '../Comments/AddComment'
 
 const PostsItem = props => {
   const [GetComments] = useLazyQuery(GetCommentsQuery)
   const navigate = useNavigate()
   const [comments, setComments] = useState([])
-  const [error, setError] = useState(null)
+  const [alert, setAlert] = useState(null)
   const [showComments, setShowComments] = useState(false)
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -20,7 +21,7 @@ const PostsItem = props => {
     if (reason === 'clickaway') {
       return
     }
-    setError(null)
+    setAlert(null)
   }
 
   const fetchComments = async () => {
@@ -35,7 +36,7 @@ const PostsItem = props => {
       if (error) throw error
       return data
     } catch (err) {
-      setError(err.message || 'An error occurred')
+      setAlert(err.message || 'An error occurred')
     }
   }
 
@@ -56,14 +57,14 @@ const PostsItem = props => {
 
   const handleViewMoreComments = async () => {
     let data = await fetchComments()
-    console.log(data)
-    if (data.getComment.length === 0 || data.getComment.length < pageSize) {
+    if (data?.getComment.length === 0 || data?.getComment.length < pageSize) {
       setShowMoreComments(prevState => !prevState)
       setCurrentPage(1)
     }
     setComments(prevData => [...prevData, ...data.getComment])
     setCurrentPage(currentPage + 1)
   }
+
   return (
     <Grid container justifyContent='center'>
       <Grid item xs={12} sm={8} md={6}>
@@ -106,18 +107,19 @@ const PostsItem = props => {
               </Typography>
             ) : (
               <Box>
-                {showComments ? <CommentList comments={comments} /> : null}
+                {showComments ? <CommentList comments={comments} setAlert={setAlert} /> : null}
                 <Button variant='text' color='primary' onClick={handleViewMoreComments}>
                   {showComments && showMoreComments ? 'View More Comments' : null}
                 </Button>
               </Box>
             )}
           </CardContent>
+          <AddComment post={props.post} setAlert={setAlert} setComments={setComments} />
         </Card>
       </Grid>
-      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='error'>
-          {error}
+      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity='info'>
+          {alert}
         </Alert>
       </Snackbar>{' '}
     </Grid>

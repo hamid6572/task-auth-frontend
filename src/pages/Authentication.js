@@ -27,7 +27,6 @@ const Authentication = () => {
         variables: { ...userData }
       })
       if (error) throw error
-      console.log(data)
       if (data?.login.token) {
         localStorage.setItem('token', data.login.token)
         localStorage.setItem('userId', data.login.user.id)

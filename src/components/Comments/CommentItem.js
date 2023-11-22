@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 import { GetCommentsRepliesQuery } from '../../api/comments'
+import AddReply from './AddReply'
 
-const CommentItem = props => {
-  let { comment } = props
+const CommentItem = ({ comment, setAlert }) => {
   const [GetCommentsReplies] = useLazyQuery(GetCommentsRepliesQuery)
   const [replies, setReplies] = useState([])
   const [showReplies, setShowReplies] = useState(false)
@@ -58,6 +58,12 @@ const CommentItem = props => {
           <Button variant='text' color='primary' onClick={handleViewReplies}>
             {showReplies ? null : 'View More Replies'}
           </Button>
+          <AddReply
+            postId={comment.post.id}
+            commentId={comment.id}
+            setReplies={setReplies}
+            setAlert={setAlert}
+          />
         </Box>
       )}
     </Box>
