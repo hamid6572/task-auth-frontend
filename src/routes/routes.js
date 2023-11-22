@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 
-import { EditPost, CreatePost, Drafts, Dashboard, NotFound, Authentication } from '../pages'
+import { EditPost, CreatePost, Dashboard, NotFound, Authentication } from '../pages'
 //import ProtectedRoute from './protected.routes'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -15,7 +15,6 @@ const Routers = () => (
 
     <Route path='/createPost' element={<CreatePost />} />
     <Route path='/posts' element={<Dashboard />} />
-    <Route path='/drafts' element={<Drafts />} />
 
     <Route path='/editpost' element={<EditPost />} />
     {/* </Route> */}
