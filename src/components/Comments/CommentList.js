@@ -4,7 +4,7 @@ const CommentList = props => {
   return (
     <>
       {props.comments?.map(comment => (
-        <CommentItem key={comment.id} comment={comment} />
+        <CommentItem key={comment.id} comment={comment} setAlert={props.setAlert} />
       ))}
     </>
   )

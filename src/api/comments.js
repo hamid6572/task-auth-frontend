@@ -17,6 +17,7 @@ export const GetCommentsQuery = gql`
         firstName
       }
       post {
+        id
         title
         content
       }
@@ -41,6 +42,7 @@ export const GetCommentsRepliesQuery = gql`
         firstName
       }
       post {
+        id
         title
         content
       }
@@ -52,6 +54,40 @@ export const GetCommentsRepliesQuery = gql`
           text
         }
       }
+    }
+  }
+`
+
+export const AddCommentMutation = gql`
+  mutation AddComment($text: String!, $postId: Float!) {
+    createComment(data: { text: $text, postId: $postId }) {
+      id
+      text
+      user {
+        firstName
+      }
+      post {
+        id
+        title
+        content
+      }
+      replies {
+        id
+        text
+        replies {
+          id
+          text
+        }
+      }
+    }
+  }
+`
+
+export const AddReplyToCommentMutation = gql`
+  mutation AddReplyToComment($text: String!, $postId: Float!, $commentId: Float!) {
+    addReplyToComment(data: { text: $text, postId: $postId, commentId: $commentId }) {
+      id
+      text
     }
   }
 `
