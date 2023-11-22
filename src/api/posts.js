@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client'
 const BASE_URL = 'http://localhost:8080/posts'
 
 export const CreatePostAPI = post =>
@@ -59,10 +60,8 @@ export const DeletePostAPI = id =>
     }
   })
 
-import { gql } from '@apollo/client'
-
 export const CreatePostMutation = gql`
-  mutation CreatePost($input: PostInput!) {
+  mutation CreatePost($input: postInput!) {
     createPost(data: $input) {
       message
     }

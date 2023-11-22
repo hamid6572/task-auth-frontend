@@ -1,125 +1,111 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-import { CreatePostAPI } from '../api/posts'
-
+import { useMutation } from '@apollo/client'
+import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material'
+import { CreatePostMutation } from '../api/posts'
 import Layout from '../components/Layout/Layout'
-import { Toastcontainer, ToastError } from '../tools/toast'
+import { Toastcontainer } from '../tools/toast'
 
 const CreatePost = () => {
   const navigate = useNavigate()
-  const titleref = useRef()
-  const descriptionref = useRef()
+  const titleref = useRef(null)
+  const descriptionref = useRef(null)
+  const [createPost] = useMutation(CreatePostMutation)
+  const [alert, setAlert] = useState(null)
 
-  let userId = localStorage.getItem('userId')
-  let err = new Error()
-
-  const createPostAPIHandeler = post => {
-    CreatePostAPI(post)
-      .then(res => {
-        err.status = res.status
-        return res.json()
-      })
-      .then(data => {
-        if (err.status !== 200) {
-          throw new Error(data.message)
-        }
-        console.log()
-        if (post.status === 'drafted')
-          navigate('/drafts', {
-            state: { firstDraft: true, draft: data.post }
-          })
-        else if (post.status === 'published') navigate('/Dashboard')
-      })
-      .catch(err => {
-        ToastError(err)
-      })
-  }
-
-  const saveDraftHandeler = () => {
-    const draft = {
-      userId: userId,
-      title: titleref.current.value,
-      content: descriptionref.current.value,
-      status: 'drafted'
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
     }
-
-    createPostAPIHandeler(draft)
+    setAlert(null)
   }
 
-  const createPostHandeler = () => {
+  const createPostAPIHandeler = async post => {
+    try {
+      const { data, error } = await createPost({
+        variables: { input: { ...post } }
+      })
+      if (error) throw error
+      console.log(data)
+      if (data?.createPost.message) {
+        setAlert(data?.createPost.message)
+        setTimeout(() => {
+          navigate('/dashboard')
+        }, 2000)
+      }
+    } catch (err) {
+      setAlert(err.message || 'An error occurred')
+    }
+  }
+
+  const createPostHandler = () => {
     const post = {
-      userId: userId,
       title: titleref.current.value,
-      content: descriptionref.current.value,
-      status: 'published'
+      content: descriptionref.current.value
     }
 
     createPostAPIHandeler(post)
   }
 
-  const cancelPostHandeler = () => navigate('/posts')
+  const cancelPostHandler = () => navigate('/posts')
 
   return (
     <div>
       <Layout />
-      <div className='container'>
+      <Container>
         <div className='row'>
           <div className='col-md-8 col-md-offset-2'>
-            <h1>Create post</h1>
-            <div className='form-group justify-content-end'>
-              <label htmlFor='title'>
-                Title <span className='require'>*</span>
-              </label>
-              <div className='float-end'>
-                <button
-                  data-testid='draftbutton'
-                  type='submit'
-                  onClick={saveDraftHandeler}
-                  className='btn btn-primary text-right my-1'
-                >
-                  Save Draft
-                </button>
-              </div>
-              <input
+            <Typography variant='h4' gutterBottom>
+              Create post
+            </Typography>
+
+            <div>
+              <TextField
+                id='posttitle'
                 data-testid='posttitle'
                 type='text'
                 className='form-control my-2'
-                placeholder='title'
-                required=''
-                name='title'
-                ref={titleref}
+                placeholder='Title'
+                inputRef={titleref}
               />
             </div>
-            <div className='form-group'>
-              <label htmlFor='dscription'>Description</label>
-              <textarea
+            <div>
+              <TextField
+                multiline
                 rows={5}
                 className='form-control my-2'
-                placeholder='content'
-                name='description'
-                defaultValue={''}
-                ref={descriptionref}
+                placeholder='Content'
+                inputRef={descriptionref}
               />
             </div>
-
             <div className='form-group'>
-              <button
+              <Button
                 type='submit'
                 data-testid='postbutton'
-                onClick={createPostHandeler}
-                className='btn btn-primary'
+                onClick={createPostHandler}
+                variant='contained'
+                color='primary'
               >
                 Create Post
-              </button>
-              <button className='btn btn-default' onClick={cancelPostHandeler}>
+              </Button>
+              <Button
+                variant='contained'
+                color='primary'
+                sx={{ marginLeft: '8px' }}
+                onClick={cancelPostHandler}
+              >
                 Cancel
-              </button>
+              </Button>
               <Toastcontainer />
             </div>
           </div>
         </div>
-      </div>
+      </Container>
+      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity='success'>
+          {alert}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
