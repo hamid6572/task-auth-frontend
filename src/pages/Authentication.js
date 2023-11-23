@@ -5,7 +5,7 @@ import { useMutation } from '@apollo/client'
 
 import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
-import { LoginMutation, SignupMutation } from '../api/auth'
+import { LoginMutation, SignupMutation } from '../apis/auth'
 
 const Authentication = () => {
   const navigate = useNavigate()

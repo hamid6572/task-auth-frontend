@@ -4,7 +4,7 @@ const PostList = props => {
   return (
     <>
       {props.posts.map(item => (
-        <PostsItem key={item.id} post={item} deleteHandeler={props.deleteHandeler} />
+        <PostsItem key={item.id} post={item} deleteHandler={props.deleteHandler} />
       ))}
     </>
   )

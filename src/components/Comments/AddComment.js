@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
-import { AddCommentMutation } from '../../api/comments'
+import { AddCommentMutation } from '../../apis/comments'
 
-const AddComment = props => {
+const AddComment = ({ setAlert, setComments, post, socket }) => {
   const [newComment, setNewComment] = useState('')
   const [addComment] = useMutation(AddCommentMutation)
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      props.setAlert('Please enter a comment.')
+      setAlert('Please enter a comment.')
       return
     }
     try {
       const { data, error } = await addComment({
         variables: {
-          postId: props.post.id,
+          postId: post.id,
           text: newComment
         }
       })
@@ -23,13 +23,12 @@ const AddComment = props => {
       if (error) throw error
 
       if (data?.createComment) {
-        props.setAlert('Comment inserted successfully')
-
-        props.setComments(prevComments => [...prevComments, data.createComment])
+        setAlert('Comment inserted successfully')
         setNewComment('')
+        socket?.emit('comment', { postId: post.id, commentId: data.createComment.id })
       }
     } catch (err) {
-      props.setAlert(err.message || 'An error occurred while adding a comment.')
+      setAlert(err.message || 'An error occurred while adding a comment.')
     }
   }
 

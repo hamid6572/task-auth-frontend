@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, CardContent, Typography, Grid, Snackbar, Alert, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
+import { io } from 'socket.io-client'
 
 import CommentList from '../Comments/CommentList'
-import { GetCommentsQuery } from '../../api/comments'
+import { GetCommentQuery, GetCommentsQuery } from '../../apis/comments'
 import AddComment from '../Comments/AddComment'
 
-const PostsItem = props => {
+const PostsItem = ({ post, deleteHandler }) => {
+  const { id, title, content, user } = post
   const [GetComments] = useLazyQuery(GetCommentsQuery)
+  const [GetComment] = useLazyQuery(GetCommentQuery)
   const navigate = useNavigate()
   const [comments, setComments] = useState([])
   const [alert, setAlert] = useState(null)
@@ -16,6 +19,34 @@ const PostsItem = props => {
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(3)
+  const [socket, setSocket] = useState(null)
+  const token = localStorage.getItem('token')
+
+  const connectSocket = () => {
+    const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL, {
+      extraHeaders: {
+        Authorization: token ? token.replace('Bearer ', '') : ''
+      }
+    })
+
+    newSocket.on('connect', () => {
+      console.log('Connected to the WebSocket server')
+      newSocket.emit('joinPostRoom', id)
+    })
+
+    newSocket.on('newComment', async (postId, commentId) => {
+      let newComment = await fetchComment(commentId)
+      console.log('Received new comment:', newComment)
+
+      if (newComment) setComments(prevComments => [...prevComments, newComment])
+    })
+
+    newSocket.on('disconnect', () => {
+      console.log('Disconnected from the WebSocket server')
+    })
+
+    setSocket(newSocket)
+  }
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -24,11 +55,26 @@ const PostsItem = props => {
     setAlert(null)
   }
 
+  const fetchComment = async commentId => {
+    try {
+      console.log('hi', commentId)
+      const { data, error } = await GetComment({
+        variables: {
+          commentId
+        }
+      })
+      if (error) throw error
+      return data.Comment
+    } catch (err) {
+      setAlert(err.message || 'An error occurred')
+    }
+  }
+
   const fetchComments = async () => {
     try {
       const { data, error } = await GetComments({
         variables: {
-          postId: props.post.id,
+          postId: id,
           itemsPerPage: pageSize,
           page: (currentPage - 1) * pageSize
         }
@@ -48,17 +94,20 @@ const PostsItem = props => {
       setShowMoreComments(prevState => !prevState)
 
       setCurrentPage(currentPage + 1)
+      connectSocket()
     }
   }
 
   const editHandler = () => {
-    navigate(`/editpost/?id=${props.post.id}`)
+    navigate(`/editpost/?id=${id}`)
   }
 
   const handleViewMoreComments = async () => {
     let data = await fetchComments()
     if (data?.getComment.length === 0 || data?.getComment.length < pageSize) {
       setShowMoreComments(prevState => !prevState)
+      setAlert('No further Comments!')
+
       setCurrentPage(1)
     }
     setComments(prevData => [...prevData, ...data.getComment])
@@ -71,18 +120,18 @@ const PostsItem = props => {
         <Card variant='outlined' sx={{ marginBottom: 2 }}>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              {props.post.title}
+              {title}
             </Typography>
 
             <Typography variant='body1' color='text.secondary'>
-              {props.post.content}
+              {content}
             </Typography>
 
             <Typography variant='subtitle2' color='text.secondary' sx={{ marginTop: 1 }}>
-              Posted By: {props.post.user.firstName}
+              Posted By: {user.firstName}
             </Typography>
 
-            {props.post.user.id.toString() === localStorage.getItem('userId') && (
+            {user.id.toString() === localStorage.getItem('userId') && (
               <Box style={{ marginTop: '1rem' }}>
                 <Button variant='outlined' color='success' onClick={editHandler}>
                   Edit
@@ -91,7 +140,7 @@ const PostsItem = props => {
                   variant='outlined'
                   color='error'
                   sx={{ marginLeft: 2 }}
-                  onClick={() => props.deleteHandler(props.post.id)}
+                  onClick={() => deleteHandler(id)}
                 >
                   Delete
                 </Button>
@@ -107,14 +156,16 @@ const PostsItem = props => {
               </Typography>
             ) : (
               <Box>
-                {showComments ? <CommentList comments={comments} setAlert={setAlert} /> : null}
-                <Button variant='text' color='primary' onClick={handleViewMoreComments}>
-                  {showComments && showMoreComments ? 'View More Comments' : null}
-                </Button>
+                {showComments && <CommentList comments={comments} setAlert={setAlert} />}
+                {showComments && showMoreComments && (
+                  <Button variant='text' color='primary' onClick={handleViewMoreComments}>
+                    View More Comments
+                  </Button>
+                )}
               </Box>
             )}
           </CardContent>
-          <AddComment post={props.post} setAlert={setAlert} setComments={setComments} />
+          <AddComment post={post} setAlert={setAlert} setComments={setComments} socket={socket} />
         </Card>
       </Grid>
       <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
