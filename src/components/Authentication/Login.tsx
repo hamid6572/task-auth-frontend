@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { TextField, Button, Box } from '@mui/material'
+import { User } from '../../types/user'
 
-const Login = props => {
-  const emailRef = React.useRef('')
-  const passwordRef = React.useRef('')
+type LoginProps = {
+  signInHandler: (data) => void
+}
+
+const Login: React.FC<LoginProps> = props => {
+  let emailRef = useRef<HTMLInputElement | null>(null)
+  let passwordRef = useRef<HTMLInputElement | null>(null)
 
   const signinHandler = () => {
     const userData = {
-      email: emailRef.current.value,
-      password: passwordRef.current.value
+      email: emailRef.current?.value || '',
+      password: passwordRef.current?.value || ''
     }
     props.signInHandler(userData)
   }
@@ -32,7 +37,6 @@ const Login = props => {
         fullWidth
         variant='outlined'
         margin='normal'
-        minLength='8'
       />
       <Button variant='contained' color='primary' fullWidth onClick={signinHandler} sx={{ mt: 2 }}>
         Sign In

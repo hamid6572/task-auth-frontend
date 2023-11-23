@@ -1,29 +1,37 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, CardContent, Typography, Grid, Snackbar, Alert, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
-import { io } from 'socket.io-client'
+import { Socket, io } from 'socket.io-client'
 
 import CommentList from '../Comments/CommentList'
 import { GetCommentQuery, GetCommentsQuery } from '../../apis/comments'
 import AddComment from '../Comments/AddComment'
+import { Post } from '../../types/post'
+import { comment } from '../../types/comment'
 
-const PostsItem = ({ post, deleteHandler }) => {
+type PostItemProps = {
+  post: Post
+  deleteHandler: (id: number) => void
+}
+
+const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
+  const token = localStorage.getItem('token')
   const { id, title, content, user } = post
   const [GetComments] = useLazyQuery(GetCommentsQuery)
   const [GetComment] = useLazyQuery(GetCommentQuery)
   const navigate = useNavigate()
-  const [comments, setComments] = useState([])
-  const [alert, setAlert] = useState(null)
+
+  const [comments, setComments] = useState<comment[]>([])
+  const [alert, setAlert] = useState('')
   const [showComments, setShowComments] = useState(false)
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(3)
-  const [socket, setSocket] = useState(null)
-  const token = localStorage.getItem('token')
+  const [socket, setSocket] = useState<Socket>()
 
   const connectSocket = () => {
-    const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL, {
+    const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL || '', {
       extraHeaders: {
         Authorization: token ? token.replace('Bearer ', '') : ''
       }
@@ -48,14 +56,14 @@ const PostsItem = ({ post, deleteHandler }) => {
     setSocket(newSocket)
   }
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
-    setAlert(null)
+    setAlert('')
   }
 
-  const fetchComment = async commentId => {
+  const fetchComment = async (commentId: number) => {
     try {
       console.log('hi', commentId)
       const { data, error } = await GetComment({

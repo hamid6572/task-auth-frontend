@@ -2,10 +2,10 @@ import React from 'react'
 import { Card, CardContent, Typography, Button, Box, Grid } from '@mui/material'
 import { useLocation } from 'react-router-dom'
 
-const SearchResults = () => {
-  const { state: { results } = {} } = useLocation()
+const SearchResults: React.FC = () => {
+  const { state } = useLocation()
 
-  return results.map(result => (
+  return state.results.map(result => (
     <Grid container justifyContent='center' key={result.id}>
       <Grid item xs={12} sm={8} md={6}>
         <Card variant='outlined' sx={{ marginBottom: 2 }}>

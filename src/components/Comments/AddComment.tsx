@@ -1,9 +1,19 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 import { AddCommentMutation } from '../../apis/comments'
+import { Post } from '../../types/post'
+import { Socket } from 'socket.io-client'
+import { comment } from '../../types/comment'
 
-const AddComment = ({ setAlert, setComments, post, socket }) => {
+export type AddCommentProps = {
+  post: Post
+  socket: Socket
+  setAlert: React.Dispatch<React.SetStateAction<string>>
+  setComments: React.Dispatch<React.SetStateAction<comment[]>>
+}
+
+const AddComment: React.FC<AddCommentProps> = ({ setAlert, setComments, post, socket }) => {
   const [newComment, setNewComment] = useState('')
   const [addComment] = useMutation(AddCommentMutation)
 
@@ -13,14 +23,12 @@ const AddComment = ({ setAlert, setComments, post, socket }) => {
       return
     }
     try {
-      const { data, error } = await addComment({
+      const { data } = await addComment({
         variables: {
           postId: post.id,
           text: newComment
         }
       })
-      console.log(data)
-      if (error) throw error
 
       if (data?.createComment) {
         setAlert('Comment inserted successfully')

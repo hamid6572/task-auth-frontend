@@ -1,3 +1,4 @@
+import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import { EditPost, CreatePost, Dashboard, NotFound, Authentication, SearchResults } from '../pages'
@@ -6,7 +7,7 @@ import { EditPost, CreatePost, Dashboard, NotFound, Authentication, SearchResult
 import 'react-toastify/dist/ReactToastify.css'
 import '../App.css'
 
-const Routers = () => (
+const Routers: React.FC = () => (
   <Routes>
     <Route path='/' element={<Authentication />} />
 

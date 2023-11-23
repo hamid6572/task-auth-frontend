@@ -1,18 +1,22 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { TextField, Button, Box } from '@mui/material'
 
-const Signup = props => {
-  const emailRef = React.useRef('')
-  const passwordRef = React.useRef('')
-  const firstNameRef = React.useRef('')
-  const lastNameRef = React.useRef('')
+type SignupProps = {
+  signupHandler: (data) => void
+}
+
+const Signup: React.FC<SignupProps> = props => {
+  let emailRef = useRef<HTMLInputElement | null>(null)
+  let passwordRef = useRef<HTMLInputElement | null>(null)
+  let firstNameRef = useRef<HTMLInputElement | null>(null)
+  let lastNameRef = useRef<HTMLInputElement | null>(null)
 
   const signupHandler = () => {
     const userData = {
-      firstName: firstNameRef.current.value,
-      lastName: lastNameRef.current.value,
-      email: emailRef.current.value,
-      password: passwordRef.current.value
+      firstName: firstNameRef.current?.value,
+      lastName: lastNameRef.current?.value,
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value
     }
     props.signupHandler(userData)
   }
@@ -55,7 +59,6 @@ const Signup = props => {
         fullWidth
         variant='outlined'
         margin='normal'
-        minLength='8'
       />
       <Button variant='contained' color='primary' fullWidth onClick={signupHandler} sx={{ mt: 2 }}>
         Sign Up

@@ -1,7 +1,9 @@
+import React from 'react'
+
 import Layout from '../components/Layout/Layout'
 import Posts from './Posts'
 
-const MainPage = () => {
+const MainPage: React.FC = () => {
   return (
     <Layout>
       <Posts />

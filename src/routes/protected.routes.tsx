@@ -1,7 +1,8 @@
+import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 
-const ProtectedRoute = () => {
+const ProtectedRoute: React.FC = () => {
   if (!localStorage.getItem('token')) {
     toast.error('User not Signed In!', {
       position: 'top-center',
@@ -17,7 +18,6 @@ const ProtectedRoute = () => {
       <div>
         <Navigate to='/' replace={true} />
         <ToastContainer
-          position='top'
           autoClose={5000}
           hideProgressBar={false}
           newestOnTop={false}
