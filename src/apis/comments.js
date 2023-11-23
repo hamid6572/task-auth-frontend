@@ -33,6 +33,30 @@ export const GetCommentsQuery = gql`
   }
 `
 
+export const GetCommentQuery = gql`
+  query Comment($commentId: Float!) {
+    Comment(postId: $commentId) {
+      id
+      text
+      user {
+        firstName
+      }
+      post {
+        id
+        title
+        content
+      }
+      replies {
+        id
+        text
+        replies {
+          id
+          text
+        }
+      }
+    }
+  }
+`
 export const GetCommentsRepliesQuery = gql`
   query GetRepliesOfComment($commentId: Float!, $page: Int!, $itemsPerPage: Int!) {
     getRepliesOfComment(commentId: $commentId, page: $page, itemsPerPage: $itemsPerPage) {

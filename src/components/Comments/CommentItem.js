@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
-import { GetCommentsRepliesQuery } from '../../api/comments'
+import { GetCommentsRepliesQuery } from '../../apis/comments'
 import AddReply from './AddReply'
 
 const CommentItem = ({ comment, setAlert }) => {
@@ -33,9 +33,11 @@ const CommentItem = ({ comment, setAlert }) => {
 
   const handleViewReplies = async () => {
     let data = await fetchReplies()
-    if (data.getRepliesOfComment.length === 0 || data.getRepliesOfComment.length < pageSize)
+    if (data.getRepliesOfComment.length === 0 || data.getRepliesOfComment.length < pageSize) {
       setShowReplies(prevState => !prevState)
-
+      setCurrentPage(1)
+      setAlert('No further Replies!')
+    }
     setReplies(prevData => [...prevData, ...data.getRepliesOfComment])
     setCurrentPage(currentPage + 1)
   }

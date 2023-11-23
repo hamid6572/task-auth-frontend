@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material'
 
-import { CreatePostMutation } from '../api/posts'
 import Layout from '../components/Layout/Layout'
 import { Toastcontainer } from '../tools/toast'
+import { CreatePostMutation } from '../apis/posts'
 
 const CreatePost = () => {
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ const CreatePost = () => {
         setAlert(data?.createPost.message)
         setTimeout(() => {
           navigate('/dashboard')
-        }, 2000)
+        }, 1000)
       }
     } catch (err) {
       setAlert(err.message || 'An error occurred')

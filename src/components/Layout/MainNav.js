@@ -10,7 +10,7 @@ import {
   Alert
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import { GlobalSearchQuery } from '../../api/posts'
+import { GlobalSearchQuery } from '../../apis/posts'
 import { useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 

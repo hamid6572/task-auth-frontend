@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
-import { AddReplyToCommentMutation } from '../../api/comments'
+import { AddReplyToCommentMutation } from '../../apis/comments'
 
 const AddReply = ({ postId, commentId, setAlert, setReplies }) => {
   const [newReply, setNewReply] = useState('')

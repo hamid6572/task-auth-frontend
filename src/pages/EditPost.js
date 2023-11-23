@@ -1,125 +1,160 @@
-import { ThreeDots } from 'react-loader-spinner'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useMutation, useLazyQuery } from '@apollo/client'
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Snackbar,
+  Alert,
+  Box,
+  CircularProgress
+} from '@mui/material'
 
-import { editPostAPI, getPostAPI } from '../api/posts'
+import { EditPostMutation, GetPostQuery } from '../apis/posts'
 import Layout from '../components/Layout/Layout'
-import { Toastcontainer, ToastError } from '../tools/toast'
 
 const EditPost = () => {
+  const navigate = useNavigate()
   const [post, setPost] = useState({})
   const [isLoading, setIsLoading] = useState(true)
-  const navigate = useNavigate()
+  const [alert, setAlert] = useState(null)
+  const [GetPost] = useLazyQuery(GetPostQuery)
+  const [EditPost] = useMutation(EditPostMutation)
 
   const search = window.location.search
-  let id = new URLSearchParams(search).get('id')
+  let id = parseInt(new URLSearchParams(search).get('id'))
 
-  const getPost = async () => {
-    const response = await getPostAPI(id)
-    return response.json()
+  const fetchPost = async () => {
+    try {
+      const { data, error } = await GetPost({
+        variables: {
+          id
+        }
+      })
+      if (error) throw error
+      return data.getPost
+    } catch (err) {
+      setAlert(err.message || 'An error occurred')
+    }
+  }
+
+  const editPost = async post => {
+    try {
+      const { data, error } = await EditPost({
+        variables: {
+          id,
+          input: {
+            ...post
+          }
+        }
+      })
+      if (error) throw error
+
+      return data.updatePost
+    } catch (err) {
+      setAlert(err.message || 'An error occurred')
+    }
   }
 
   useEffect(() => {
-    getPost().then(data => {
+    fetchPost().then(data => {
       setIsLoading(false)
-      setPost(data.post)
+      setPost(data)
     })
     // eslint-disable-next-line
   }, [])
 
-  const titleInput = post.title
-  const contentInput = post.content
-  const updatedTitle = useRef()
-  const updatedContent = useRef()
-  let err = new Error()
+  const titleInput = post?.title
+  const contentInput = post?.content
+  const updatedTitleRef = useRef()
+  const updatedContentRef = useRef()
 
-  const editPostHandeler = () => {
+  const editPostHandler = async () => {
     const updatedPost = {
-      title: updatedTitle.current.value,
-      content: updatedContent.current.value
+      title: updatedTitleRef.current.value,
+      content: updatedContentRef.current.value
     }
 
-    editPostAPI(id, updatedPost)
-      .then(res => {
-        err.status = res.status
-        return res.json()
-      })
-      .then(data => {
-        if (err.status !== 200) {
-          throw new Error(data.message)
-        }
-        if (post.status === 'drafted') navigate('/drafts')
-        else navigate('/Dashboard')
-      })
-      .catch(err => {
-        ToastError(err)
-      })
+    let updatedPostResult = await editPost(updatedPost)
+    if (updatedPostResult) {
+      setAlert(updatedPostResult.message)
+      setTimeout(() => {
+        navigate('/posts')
+      }, 1000)
+    }
   }
 
-  const cancelPostHandeler = () => navigate('/posts')
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
+  const cancelPostHandler = () => navigate('/posts')
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setAlert(null)
   }
 
   return (
     <div>
       <Layout />
       {isLoading ? (
-        <div style={style}>
-          <ThreeDots type='ThreeDots' color='#55c57a' height={80} width={80} />
-        </div>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '70vh'
+          }}
+        >
+          <CircularProgress color='primary' />
+        </Box>
       ) : (
-        <div className='container'>
-          <div className='row'>
-            <div className='col-md-8 col-md-offset-2'>
-              <h1>Edit post</h1>
-              <div className='form-group'>
-                <label htmlFor='title'>
-                  Title
-                  <span className='require'>*</span>
-                </label>
-                <input
-                  data-testid='posttitle'
-                  type='text'
-                  className='form-control'
-                  name='title'
-                  defaultValue={titleInput}
-                  ref={updatedTitle}
-                />
-              </div>
-              <div className='form-group'>
-                <label htmlFor='dscription'>Description</label>
-                <textarea
-                  rows={5}
-                  className='form-control'
-                  name='description'
-                  defaultValue={contentInput}
-                  ref={updatedContent}
-                />
-              </div>
-
-              <div className='form-group'>
-                <button
-                  data-testid='editbutton'
-                  type='submit'
-                  onClick={editPostHandeler}
-                  className='btn btn-primary'
-                >
-                  Edit Post
-                </button>
-                <button className='btn btn-default' onClick={cancelPostHandeler}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-          <Toastcontainer />
-        </div>
+        <Container>
+          <Typography variant='h4' gutterBottom>
+            Edit post
+          </Typography>
+          <TextField
+            data-testid='posttitle'
+            type='text'
+            label='Title'
+            className='form-control my-2'
+            defaultValue={titleInput}
+            inputRef={updatedTitleRef}
+          />
+          <TextField
+            multiline
+            rows={5}
+            className='form-control my-2'
+            label='Description'
+            defaultValue={contentInput}
+            inputRef={updatedContentRef}
+          />
+          <Box mt={2}>
+            <Button
+              data-testid='editbutton'
+              type='submit'
+              variant='contained'
+              color='primary'
+              onClick={editPostHandler}
+            >
+              Edit Post
+            </Button>
+            <Button
+              variant='contained'
+              color='primary'
+              sx={{ marginLeft: '8px' }}
+              onClick={cancelPostHandler}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Container>
       )}
+      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity='success'>
+          {alert}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
