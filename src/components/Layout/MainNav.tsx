@@ -12,9 +12,10 @@ import {
 import SearchIcon from '@mui/icons-material/Search'
 import { GlobalSearchQuery } from '../../apis/posts'
 import { useLazyQuery } from '@apollo/client'
-import { useState } from 'react'
 
-const MainNav = () => {
+import React, { useState } from 'react'
+
+const MainNav: React.FC = () => {
   const [searchPosts] = useLazyQuery(GlobalSearchQuery)
   const [searchText, setSearchText] = useState('')
   const [searchResults, setSearchResults] = useState(null)
@@ -38,19 +39,19 @@ const MainNav = () => {
         setSearchResults(data.search)
         navigate('/search', { state: { results: data.search } })
       }
-    } catch (err) {
-      setAlert(err.message || 'An error occurred while search.')
+    } catch (error) {
+      setAlert(error.message || 'An error occurred while search.')
     }
     if (searchResults) {
       return null
     }
   }
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
-    setAlert(null)
+    setAlert('')
   }
 
   const signoutHandler = () => {

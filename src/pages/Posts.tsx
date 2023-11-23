@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography, Snackbar, Alert } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
 
 import { DeletePostMutation, GetPostsQuery } from '../apis/posts'
 import PostsList from '../components/Posts/PostsList'
+import { Post } from '../types/post'
 
-const Posts = () => {
-  const [posts, setPosts] = useState([])
+const Posts: React.FC = () => {
+  const [posts, setPosts] = useState<Post[]>([])
   const [getPosts] = useLazyQuery(GetPostsQuery)
   const [error, setError] = useState(null)
   const [DeletePost] = useMutation(DeletePostMutation)
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
@@ -36,18 +37,17 @@ const Posts = () => {
   }, [])
 
   const resetPosts = id => {
-    let renewdPosts = posts.filter(post => parseInt(post.id) !== parseInt(id))
+    let renewdPosts = posts.filter(post => post.id !== parseInt(id))
     setPosts(renewdPosts)
   }
   const deletePost = async id => {
     try {
       console.log('==>', id)
-      const { data, error } = await DeletePost({
+      const { data } = await DeletePost({
         variables: {
           id
         }
       })
-      if (error) throw error
       console.log(data)
       if (data) {
         resetPosts(id)
@@ -57,7 +57,7 @@ const Posts = () => {
       setError(err.message || 'An error occurred')
     }
   }
-  const deleteHandler = id => {
+  const deleteHandler = (id: number) => {
     deletePost(id)
   }
 

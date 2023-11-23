@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 import { GetCommentsRepliesQuery } from '../../apis/comments'
 import AddReply from './AddReply'
+import { comment } from '../../types/comment'
 
-const CommentItem = ({ comment, setAlert }) => {
+export type CommentItemProps = {
+  comment: comment
+  setAlert: React.Dispatch<React.SetStateAction<string>>
+}
+
+const CommentItem: React.FC<CommentItemProps> = ({ comment, setAlert }) => {
   const [GetCommentsReplies] = useLazyQuery(GetCommentsRepliesQuery)
-  const [replies, setReplies] = useState([])
+  const [replies, setReplies] = useState<comment[]>([])
   const [showReplies, setShowReplies] = useState(false)
   const [currentPage, setCurrentPage] = useState(2)
   const [pageSize] = useState(2)

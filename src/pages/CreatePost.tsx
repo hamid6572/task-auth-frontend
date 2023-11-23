@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material'
@@ -7,26 +7,31 @@ import Layout from '../components/Layout/Layout'
 import { Toastcontainer } from '../tools/toast'
 import { CreatePostMutation } from '../apis/posts'
 
-const CreatePost = () => {
+type post = {
+  title: string
+  content: string
+}
+
+const CreatePost: React.FC = () => {
   const navigate = useNavigate()
-  const titleref = useRef(null)
-  const descriptionref = useRef(null)
+  const titleref = useRef<HTMLInputElement | null>(null)
+  const descriptionref = useRef<HTMLInputElement | null>(null)
+
   const [createPost] = useMutation(CreatePostMutation)
   const [alert, setAlert] = useState(null)
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
     setAlert(null)
   }
 
-  const createPostAPIHandeler = async post => {
+  const createPostAPIHandeler = async (post: post) => {
     try {
-      const { data, error } = await createPost({
+      const { data } = await createPost({
         variables: { input: { ...post } }
       })
-      if (error) throw error
       if (data?.createPost.message) {
         setAlert(data?.createPost.message)
         setTimeout(() => {
@@ -39,12 +44,10 @@ const CreatePost = () => {
   }
 
   const createPostHandler = () => {
-    const post = {
-      title: titleref.current.value,
-      content: descriptionref.current.value
-    }
-
-    createPostAPIHandeler(post)
+    createPostAPIHandeler({
+      title: titleref.current?.value || '',
+      content: descriptionref.current?.value || ''
+    })
   }
 
   const cancelPostHandler = () => navigate('/posts')

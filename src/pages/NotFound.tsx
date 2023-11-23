@@ -1,6 +1,7 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
 
-const NotFound = () => {
+const NotFound: React.FC = () => {
   return (
     <div className='text-center h1 my-3 '>
       <p>Page does not Exist!</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Tabs, Tab, Box, Container, Paper, Typography, Snackbar, Alert } from '@mui/material'
 import { useMutation } from '@apollo/client'
@@ -6,15 +6,30 @@ import { useMutation } from '@apollo/client'
 import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
 import { LoginMutation, SignupMutation } from '../apis/auth'
+import { User } from '../types/user'
 
-const Authentication = () => {
+type SignupData = {
+  register: {
+    token: string
+    user: User
+  }
+}
+
+type SignupVariables = {
+  email: string
+  firstName: string
+  lastName: string
+  password: string
+}
+
+const Authentication: React.FC = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState(0)
-  const [registerUser] = useMutation(SignupMutation)
+  const [registerUser] = useMutation<SignupData, SignupVariables>(SignupMutation)
   const [loginUser] = useMutation(LoginMutation)
   const [error, setError] = useState(null)
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
@@ -23,10 +38,9 @@ const Authentication = () => {
 
   const signInHandler = async userData => {
     try {
-      const { data, error } = await loginUser({
+      const { data } = await loginUser({
         variables: { ...userData }
       })
-      if (error) throw error
       if (data?.login.token) {
         localStorage.setItem('token', data.login.token)
         localStorage.setItem('userId', data.login.user.id)
@@ -40,12 +54,11 @@ const Authentication = () => {
 
   const signUpHandler = async userData => {
     try {
-      const { data, error } = await registerUser({
+      const { data } = await registerUser({
         variables: {
           ...userData
         }
       })
-      if (error) throw error
 
       if (data?.register.token) {
         localStorage.setItem('token', data.register.token)

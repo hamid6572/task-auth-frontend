@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 import { AddReplyToCommentMutation } from '../../apis/comments'
+import { comment } from '../../types/comment'
 
-const AddReply = ({ postId, commentId, setAlert, setReplies }) => {
+export type AddReplyProps = {
+  postId: number
+  commentId: number
+  setAlert: React.Dispatch<React.SetStateAction<string>>
+  setReplies: React.Dispatch<React.SetStateAction<comment[]>>
+}
+
+const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setAlert, setReplies }) => {
   const [newReply, setNewReply] = useState('')
   const [addReply] = useMutation(AddReplyToCommentMutation)
 
@@ -14,15 +22,14 @@ const AddReply = ({ postId, commentId, setAlert, setReplies }) => {
     }
     try {
       console.log(postId, commentId)
-      const { data, error } = await addReply({
+      const { data } = await addReply({
         variables: {
           commentId: commentId,
           postId: postId,
           text: newReply
         }
       })
-      if (error) throw error
-      console.log(data)
+
       if (data?.addReplyToComment) {
         setAlert('Reply added successfully')
         setReplies(prevReplies => [...prevReplies, data.addReplyToComment])

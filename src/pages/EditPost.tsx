@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useLazyQuery } from '@apollo/client'
 import {
@@ -15,16 +15,21 @@ import {
 import { EditPostMutation, GetPostQuery } from '../apis/posts'
 import Layout from '../components/Layout/Layout'
 
-const EditPost = () => {
+type post = {
+  title: string
+  content: string
+}
+
+const EditPost: React.FC = () => {
   const navigate = useNavigate()
-  const [post, setPost] = useState({})
+  const [post, setPost] = useState<post>()
   const [isLoading, setIsLoading] = useState(true)
   const [alert, setAlert] = useState(null)
   const [GetPost] = useLazyQuery(GetPostQuery)
   const [EditPost] = useMutation(EditPostMutation)
 
   const search = window.location.search
-  let id = parseInt(new URLSearchParams(search).get('id'))
+  let id = parseInt(new URLSearchParams(search).get('id') || '')
 
   const fetchPost = async () => {
     try {
@@ -42,7 +47,7 @@ const EditPost = () => {
 
   const editPost = async post => {
     try {
-      const { data, error } = await EditPost({
+      const { data } = await EditPost({
         variables: {
           id,
           input: {
@@ -50,7 +55,6 @@ const EditPost = () => {
           }
         }
       })
-      if (error) throw error
 
       return data.updatePost
     } catch (err) {
@@ -68,13 +72,13 @@ const EditPost = () => {
 
   const titleInput = post?.title
   const contentInput = post?.content
-  const updatedTitleRef = useRef()
-  const updatedContentRef = useRef()
+  const updatedTitleRef = useRef<HTMLInputElement | null>(null)
+  const updatedContentRef = useRef<HTMLInputElement | null>(null)
 
   const editPostHandler = async () => {
     const updatedPost = {
-      title: updatedTitleRef.current.value,
-      content: updatedContentRef.current.value
+      title: updatedTitleRef.current?.value || '',
+      content: updatedContentRef.current?.value || ''
     }
 
     let updatedPostResult = await editPost(updatedPost)
@@ -87,7 +91,7 @@ const EditPost = () => {
   }
 
   const cancelPostHandler = () => navigate('/posts')
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = reason => {
     if (reason === 'clickaway') {
       return
     }
