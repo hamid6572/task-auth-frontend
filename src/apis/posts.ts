@@ -25,6 +25,24 @@ export const GetPostsQuery = gql`
   }
 `
 
+export const GetPaginatedPostsQuery = gql`
+  query PaginatedPosts($page: Int!, $itemsPerPage: Int!) {
+    paginatedPosts(page: $page, itemsPerPage: $itemsPerPage) {
+      id
+      title
+      content
+      user {
+        id
+        firstName
+      }
+      comments {
+        id
+        text
+      }
+    }
+  }
+`
+
 export const GlobalSearchQuery = gql`
   query Search($input: String!) {
     search(input: $input) {
@@ -36,6 +54,22 @@ export const GlobalSearchQuery = gql`
       comments {
         id
         text
+        user {
+          firstName
+        }
+        post {
+          id
+          title
+          content
+        }
+        replies {
+          id
+          text
+          replies {
+            id
+            text
+          }
+        }
       }
       id
       title

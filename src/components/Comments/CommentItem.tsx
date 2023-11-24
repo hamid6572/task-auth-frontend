@@ -49,17 +49,17 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, setAlert }) => {
   }
 
   return (
-    <Box key={comment.id}>
+    <Box key={comment.id} sx={{ marginLeft: 2 }}>
       <Typography variant='subtitle2' color='text.secondary' sx={{ marginTop: 1 }}>
         {comment.user.firstName}
       </Typography>
       <Typography variant='body1' gutterBottom>
         {comment.text}, {comment.id}
       </Typography>
-      {comment.replies.length > 0 && (
+      {comment.replies?.length > 0 && (
         <Box>
           {replies.map(reply => (
-            <Typography key={reply.id} color='textSecondary' sx={{ marginLeft: 2 }}>
+            <Typography key={reply.id} color='textSecondary' sx={{ marginLeft: 4 }}>
               {reply.text}, {reply.id}
             </Typography>
           ))}

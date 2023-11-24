@@ -65,7 +65,6 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
 
   const fetchComment = async (commentId: number) => {
     try {
-      console.log('hi', commentId)
       const { data, error } = await GetComment({
         variables: {
           commentId
