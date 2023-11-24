@@ -1,25 +1,26 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
+
 import { AddCommentMutation } from '../../apis/comments'
 import { Post } from '../../types/post'
 import { Socket } from 'socket.io-client'
-import { comment } from '../../types/comment'
+import { setError } from '../../redux/actions/ErrorActions'
 
 export type AddCommentProps = {
   post: Post
-  socket: Socket
-  setAlert: React.Dispatch<React.SetStateAction<string>>
-  setComments: React.Dispatch<React.SetStateAction<comment[]>>
+  socket: Socket | undefined
 }
 
-const AddComment: React.FC<AddCommentProps> = ({ setAlert, setComments, post, socket }) => {
+const AddComment: React.FC<AddCommentProps> = ({ post, socket }) => {
+  const dispatch = useDispatch()
   const [newComment, setNewComment] = useState('')
   const [addComment] = useMutation(AddCommentMutation)
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      setAlert('Please enter a comment.')
+      dispatch(setError('Please enter a comment.'))
       return
     }
     try {
@@ -31,12 +32,12 @@ const AddComment: React.FC<AddCommentProps> = ({ setAlert, setComments, post, so
       })
 
       if (data?.createComment) {
-        setAlert('Comment inserted successfully')
+        dispatch(setError('Comment inserted successfully'))
         setNewComment('')
         socket?.emit('comment', { postId: post.id, commentId: data.createComment.id })
       }
     } catch (err) {
-      setAlert(err.message || 'An error occurred while adding a comment.')
+      dispatch(setError(err.message || 'An error occurred while adding a comment.'))
     }
   }
 

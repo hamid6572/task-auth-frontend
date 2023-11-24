@@ -1,33 +1,27 @@
+import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  InputBase,
-  IconButton,
-  Snackbar,
-  Alert
-} from '@mui/material'
+import { useDispatch } from 'react-redux'
+import { AppBar, Toolbar, Typography, Box, InputBase, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import { GlobalSearchQuery } from '../../apis/posts'
 import { useLazyQuery } from '@apollo/client'
 
-import React, { useState } from 'react'
+import { setError } from '../../redux/actions/ErrorActions'
+import { GlobalSearchQuery } from '../../apis/posts'
 
 const MainNav: React.FC = () => {
   const [searchPosts] = useLazyQuery(GlobalSearchQuery)
   const [searchText, setSearchText] = useState('')
   const [searchResults, setSearchResults] = useState(null)
-  const [alert, setAlert] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleSearch = async () => {
     if (!searchText.trim()) {
-      setAlert('Nothing to search.')
+      dispatch(setError('Nothing to search.'))
       return
     }
+
     try {
       const { data, error } = await searchPosts({
         variables: {
@@ -40,18 +34,11 @@ const MainNav: React.FC = () => {
         navigate('/search', { state: { results: data.search } })
       }
     } catch (error) {
-      setAlert(error.message || 'An error occurred while search.')
+      dispatch(setError(error.message || 'An error occurred while search.'))
     }
     if (searchResults) {
       return null
     }
-  }
-
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setAlert('')
   }
 
   const signoutHandler = () => {
@@ -59,7 +46,10 @@ const MainNav: React.FC = () => {
     localStorage.removeItem('token')
   }
 
-  const isDashboardOrPosts = location.pathname === '/Dashboard' || location.pathname === '/posts'
+  const isDashboardOrPosts =
+    location.pathname === '/Dashboard' ||
+    location.pathname === '/dashboard' ||
+    location.pathname === '/posts'
   return (
     <AppBar position='static'>
       <Toolbar>
@@ -107,11 +97,6 @@ const MainNav: React.FC = () => {
           </Typography>
         </Box>
       </Toolbar>
-      <Snackbar open={Boolean(alert)} autoHideDuration={4000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='info'>
-          {alert}
-        </Alert>
-      </Snackbar>{' '}
     </AppBar>
   )
 }

@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
+
 import { GetCommentsRepliesQuery } from '../../apis/comments'
 import AddReply from './AddReply'
 import { comment } from '../../types/comment'
+import { setError } from '../../redux/actions/ErrorActions'
 
 export type CommentItemProps = {
   comment: comment
-  setAlert: React.Dispatch<React.SetStateAction<string>>
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, setAlert }) => {
+const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   const [GetCommentsReplies] = useLazyQuery(GetCommentsRepliesQuery)
   const [replies, setReplies] = useState<comment[]>([])
   const [showReplies, setShowReplies] = useState(false)
   const [currentPage, setCurrentPage] = useState(2)
   const [pageSize] = useState(2)
-
+  const dispatch = useDispatch()
   useEffect(() => {
     if (comment.replies && Array.isArray(comment.replies)) {
       const firstTwoReplies = comment.replies.slice(0, 2)
@@ -42,7 +44,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, setAlert }) => {
     if (data.getRepliesOfComment.length === 0 || data.getRepliesOfComment.length < pageSize) {
       setShowReplies(prevState => !prevState)
       setCurrentPage(1)
-      setAlert('No further Replies!')
+      dispatch(setError('No further Replies!'))
     }
     setReplies(prevData => [...prevData, ...data.getRepliesOfComment])
     setCurrentPage(currentPage + 1)
@@ -66,12 +68,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, setAlert }) => {
           <Button variant='text' color='primary' onClick={handleViewReplies}>
             {showReplies ? null : 'View More Replies'}
           </Button>
-          <AddReply
-            postId={comment.post.id}
-            commentId={comment.id}
-            setReplies={setReplies}
-            setAlert={setAlert}
-          />
+          <AddReply postId={comment.post.id} commentId={comment.id} setReplies={setReplies} />
         </Box>
       )}
     </Box>

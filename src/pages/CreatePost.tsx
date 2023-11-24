@@ -1,11 +1,13 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material'
+import { TextField, Button, Container, Typography } from '@mui/material'
 
 import Layout from '../components/Layout/Layout'
 import { Toastcontainer } from '../tools/toast'
 import { CreatePostMutation } from '../apis/posts'
+import { setError } from '../redux/actions/ErrorActions'
 
 type post = {
   title: string
@@ -14,18 +16,11 @@ type post = {
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const titleref = useRef<HTMLInputElement | null>(null)
   const descriptionref = useRef<HTMLInputElement | null>(null)
-
   const [createPost] = useMutation(CreatePostMutation)
-  const [alert, setAlert] = useState(null)
-
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setAlert(null)
-  }
 
   const createPostAPIHandeler = async (post: post) => {
     try {
@@ -33,13 +28,13 @@ const CreatePost: React.FC = () => {
         variables: { input: { ...post } }
       })
       if (data?.createPost.message) {
-        setAlert(data?.createPost.message)
+        dispatch(setError(data?.createPost.message))
         setTimeout(() => {
           navigate('/dashboard')
         }, 1000)
       }
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -64,6 +59,7 @@ const CreatePost: React.FC = () => {
 
             <div>
               <TextField
+                required
                 id='posttitle'
                 data-testid='posttitle'
                 type='text'
@@ -104,11 +100,6 @@ const CreatePost: React.FC = () => {
           </div>
         </div>
       </Container>
-      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='success'>
-          {alert}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }
