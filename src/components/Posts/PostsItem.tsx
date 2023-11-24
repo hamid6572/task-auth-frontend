@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, CardContent, Typography, Grid, Snackbar, Alert, Box } from '@mui/material'
+import { useDispatch } from 'react-redux'
+import { Button, Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 import { Socket, io } from 'socket.io-client'
 
@@ -9,6 +10,7 @@ import { GetCommentQuery, GetCommentsQuery } from '../../apis/comments'
 import AddComment from '../Comments/AddComment'
 import { Post } from '../../types/post'
 import { comment } from '../../types/comment'
+import { setError } from '../../redux/actions/ErrorActions'
 
 type PostItemProps = {
   post: Post
@@ -21,9 +23,9 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   const [GetComments] = useLazyQuery(GetCommentsQuery)
   const [GetComment] = useLazyQuery(GetCommentQuery)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [comments, setComments] = useState<comment[]>([])
-  const [alert, setAlert] = useState('')
   const [showComments, setShowComments] = useState(false)
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -56,13 +58,6 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
     setSocket(newSocket)
   }
 
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setAlert('')
-  }
-
   const fetchComment = async (commentId: number) => {
     try {
       const { data, error } = await GetComment({
@@ -73,7 +68,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
       if (error) throw error
       return data.Comment
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -89,7 +84,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
       if (error) throw error
       return data
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -113,7 +108,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
     let data = await fetchComments()
     if (data?.getComment.length === 0 || data?.getComment.length < pageSize) {
       setShowMoreComments(prevState => !prevState)
-      setAlert('No further Comments!')
+      dispatch(setError('No further Comments!'))
 
       setCurrentPage(1)
     }
@@ -163,7 +158,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
               </Typography>
             ) : (
               <Box>
-                {showComments && <CommentList comments={comments} setAlert={setAlert} />}
+                {showComments && <CommentList comments={comments} />}
                 {showComments && showMoreComments && (
                   <Button variant='text' color='primary' onClick={handleViewMoreComments}>
                     View More Comments
@@ -172,14 +167,9 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
               </Box>
             )}
           </CardContent>
-          <AddComment post={post} setAlert={setAlert} setComments={setComments} socket={socket} />
+          <AddComment post={post} socket={socket} />
         </Card>
       </Grid>
-      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='info'>
-          {alert}
-        </Alert>
-      </Snackbar>{' '}
     </Grid>
   )
 }

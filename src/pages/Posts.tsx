@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { Typography, Snackbar, Alert } from '@mui/material'
+import { Typography } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
 
 import { DeletePostMutation, GetPaginatedPostsQuery } from '../apis/posts'
 import PostsList from '../components/Posts/PostsList'
 import { Post } from '../types/post'
+import { useDispatch } from 'react-redux'
+import { setError } from '../redux/actions/ErrorActions'
 
 const Posts: React.FC = () => {
+  const dispatch = useDispatch()
   const [getPaginatedPosts] = useLazyQuery(GetPaginatedPostsQuery)
   const [DeletePost] = useMutation(DeletePostMutation)
 
   const [posts, setPosts] = useState<Post[]>([])
-  const [alert, setAlert] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(5)
   const [showPosts, setShowPosts] = useState(true)
-
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setAlert('')
-  }
 
   const handleScroll = () => {
     const windowHeight = window.innerHeight
@@ -44,7 +39,7 @@ const Posts: React.FC = () => {
       if (error) throw error
       return data
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
   let data = {
@@ -56,7 +51,7 @@ const Posts: React.FC = () => {
   }
 
   useEffect(() => {
-    fetch().catch(error => setAlert(error.message || 'An error occurred'))
+    fetch().catch(error => dispatch(setError(error.message || 'An error occurred')))
     // eslint-disable-next-line
   }, [])
 
@@ -74,7 +69,7 @@ const Posts: React.FC = () => {
     setPosts(prevData => [...prevData, ...data.paginatedPosts])
     if (data?.paginatedPosts.length === 0 || data?.paginatedPosts.length < pageSize) {
       setShowPosts(prevState => !prevState)
-      setAlert('No further Posts!')
+      dispatch(setError('No further Posts!'))
 
       setCurrentPage(1)
     }
@@ -100,7 +95,7 @@ const Posts: React.FC = () => {
       }
     } catch (err) {
       console.log(err)
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
   const deleteHandler = (id: number) => {
@@ -118,11 +113,6 @@ const Posts: React.FC = () => {
           <PostsList posts={posts} deleteHandler={deleteHandler} />
         </div>
       )}
-      <Snackbar open={Boolean(alert)} autoHideDuration={4000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='error'>
-          {alert}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

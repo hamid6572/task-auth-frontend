@@ -1,19 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useLazyQuery } from '@apollo/client'
-import {
-  TextField,
-  Button,
-  Container,
-  Typography,
-  Snackbar,
-  Alert,
-  Box,
-  CircularProgress
-} from '@mui/material'
+import { TextField, Button, Container, Typography, Box, CircularProgress } from '@mui/material'
 
 import { EditPostMutation, GetPostQuery } from '../apis/posts'
 import Layout from '../components/Layout/Layout'
+import { useDispatch } from 'react-redux'
+import { setError } from '../redux/actions/ErrorActions'
 
 type post = {
   title: string
@@ -22,9 +15,9 @@ type post = {
 
 const EditPost: React.FC = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [post, setPost] = useState<post>()
   const [isLoading, setIsLoading] = useState(true)
-  const [alert, setAlert] = useState(null)
   const [GetPost] = useLazyQuery(GetPostQuery)
   const [EditPost] = useMutation(EditPostMutation)
 
@@ -41,7 +34,7 @@ const EditPost: React.FC = () => {
       if (error) throw error
       return data.getPost
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -58,7 +51,7 @@ const EditPost: React.FC = () => {
 
       return data.updatePost
     } catch (err) {
-      setAlert(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -83,7 +76,7 @@ const EditPost: React.FC = () => {
 
     let updatedPostResult = await editPost(updatedPost)
     if (updatedPostResult) {
-      setAlert(updatedPostResult.message)
+      dispatch(setError(updatedPostResult.message))
       setTimeout(() => {
         navigate('/posts')
       }, 1000)
@@ -91,12 +84,6 @@ const EditPost: React.FC = () => {
   }
 
   const cancelPostHandler = () => navigate('/posts')
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setAlert(null)
-  }
 
   return (
     <div>
@@ -154,11 +141,6 @@ const EditPost: React.FC = () => {
           </Box>
         </Container>
       )}
-      <Snackbar open={Boolean(alert)} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity='success'>
-          {alert}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

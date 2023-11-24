@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Tabs, Tab, Box, Container, Paper, Typography, Snackbar, Alert } from '@mui/material'
+import { useDispatch } from 'react-redux'
+import { Tabs, Tab, Box, Container, Paper, Typography } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
 import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
 import { LoginMutation, SignupMutation } from '../apis/auth'
 import { User } from '../types/user'
+import { setError } from '../redux/actions/ErrorActions'
 
 type SignupData = {
   register: {
@@ -27,14 +29,7 @@ const Authentication: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0)
   const [registerUser] = useMutation<SignupData, SignupVariables>(SignupMutation)
   const [loginUser] = useMutation(LoginMutation)
-  const [error, setError] = useState(null)
-
-  const handleSnackbarClose = reason => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setError(null)
-  }
+  const dispatch = useDispatch()
 
   const signInHandler = async userData => {
     try {
@@ -48,7 +43,7 @@ const Authentication: React.FC = () => {
         navigate('Dashboard')
       }
     } catch (err) {
-      setError(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
 
@@ -67,7 +62,7 @@ const Authentication: React.FC = () => {
         navigate('Dashboard')
       }
     } catch (err) {
-      setError(err.message || 'An error occurred')
+      dispatch(setError(err.message || 'An error occurred'))
     }
   }
   const handleTabChange = (event, newValue) => {
@@ -107,11 +102,6 @@ const Authentication: React.FC = () => {
             )}
           </Box>
         </Paper>
-        <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleSnackbarClose}>
-          <Alert onClose={handleSnackbarClose} severity='error'>
-            {error}
-          </Alert>
-        </Snackbar>{' '}
       </Container>
     </Box>
   )
