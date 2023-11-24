@@ -1,6 +1,5 @@
 import React, { useRef } from 'react'
 import { TextField, Button, Box } from '@mui/material'
-import { User } from '../../types/user'
 
 type LoginProps = {
   signInHandler: (data) => void
