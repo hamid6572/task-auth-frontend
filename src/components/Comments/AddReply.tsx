@@ -14,9 +14,9 @@ export type AddReplyProps = {
 }
 
 const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) => {
-  const dispatch = useDispatch()
   const [newReply, setNewReply] = useState('')
   const [addReply] = useMutation(AddReplyToCommentMutation)
+  const dispatch = useDispatch()
 
   const handleAddReply = async () => {
     if (!newReply.trim()) {

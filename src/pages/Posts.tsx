@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { Typography } from '@mui/material'
+import { useDispatch } from 'react-redux'
+import { Box, CircularProgress, Skeleton, Typography } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { debounce } from 'lodash'
 
 import { DeletePostMutation, GetPaginatedPostsQuery } from '../apis/posts'
 import PostsList from '../components/Posts/PostsList'
 import { Post } from '../types/post'
-import { useDispatch } from 'react-redux'
 import { setError } from '../redux/actions/ErrorActions'
+import { useLocation } from 'react-router-dom'
 
 const Posts: React.FC = () => {
-  const dispatch = useDispatch()
-  const [getPaginatedPosts] = useLazyQuery(GetPaginatedPostsQuery)
-  const [DeletePost] = useMutation(DeletePostMutation)
-
   const [posts, setPosts] = useState<Post[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(5)
-  const [showPosts, setShowPosts] = useState(true)
+  const [pageSize] = useState(4)
 
-  const handleScroll = () => {
+  const [getPaginatedPosts] = useLazyQuery(GetPaginatedPostsQuery)
+  const [DeletePost] = useMutation(DeletePostMutation)
+  const dispatch = useDispatch()
+  const { state } = useLocation()
+
+  const handleScroll = debounce(() => {
     const windowHeight = window.innerHeight
     const documentHeight = document.documentElement.scrollHeight
     const windowBottom = window.scrollY + windowHeight
@@ -26,17 +28,23 @@ const Posts: React.FC = () => {
     if (windowBottom >= documentHeight - 100) {
       handleViewPosts()
     }
-  }
+  }, 100)
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [handleScroll])
 
   const fetchData = async () => {
     try {
-      const { data, error } = await getPaginatedPosts({
+      const { data } = await getPaginatedPosts({
         variables: {
           itemsPerPage: pageSize,
           page: (currentPage - 1) * pageSize
         }
       })
-      if (error) throw error
       return data
     } catch (err) {
       dispatch(setError(err.message || 'An error occurred'))
@@ -46,31 +54,25 @@ const Posts: React.FC = () => {
     paginatedPosts: []
   }
   const fetch = async () => {
-    data = await fetchData()
+    data = await fetchData().catch(error =>
+      dispatch(setError(error.message || 'An error occurred'))
+    )
     setPosts(prevData => [...prevData, ...data?.paginatedPosts])
   }
 
   useEffect(() => {
-    fetch().catch(error => dispatch(setError(error.message || 'An error occurred')))
-    // eslint-disable-next-line
-  }, [])
+    fetch()
+    setCurrentPage(currentPage + 1)
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
     // eslint-disable-next-line
-  }, [posts])
+  }, [state?.post])
 
   const handleViewPosts = async () => {
     let data = await fetchData()
 
     setPosts(prevData => [...prevData, ...data.paginatedPosts])
     if (data?.paginatedPosts.length === 0 || data?.paginatedPosts.length < pageSize) {
-      setShowPosts(prevState => !prevState)
       dispatch(setError('No further Posts!'))
-
       setCurrentPage(1)
     }
 
@@ -89,12 +91,8 @@ const Posts: React.FC = () => {
           id
         }
       })
-      console.log(data)
-      if (data) {
-        resetPosts(id)
-      }
+      if (data) resetPosts(id)
     } catch (err) {
-      console.log(err)
       dispatch(setError(err.message || 'An error occurred'))
     }
   }
@@ -105,9 +103,16 @@ const Posts: React.FC = () => {
   return (
     <div>
       {posts.length === 0 ? (
-        <Typography variant='h4' align='center' gutterBottom>
-          No Posts Available
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '70vh'
+          }}
+        >
+          <CircularProgress color='primary' />
+        </Box>
       ) : (
         <div>
           <PostsList posts={posts} deleteHandler={deleteHandler} />

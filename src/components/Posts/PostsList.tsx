@@ -9,11 +9,11 @@ export type PostListProps = {
 
 const PostList: React.FC<PostListProps> = props => {
   return (
-    <>
+    <React.Fragment>
       {props.posts.map(item => (
         <PostsItem key={item.id} post={item} deleteHandler={props.deleteHandler} />
       ))}
-    </>
+    </React.Fragment>
   )
 }
 

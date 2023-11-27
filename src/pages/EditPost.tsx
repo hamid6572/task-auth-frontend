@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { useMutation, useLazyQuery } from '@apollo/client'
 import { TextField, Button, Container, Typography, Box, CircularProgress } from '@mui/material'
 
 import { EditPostMutation, GetPostQuery } from '../apis/posts'
 import Layout from '../components/Layout/Layout'
-import { useDispatch } from 'react-redux'
 import { setError } from '../redux/actions/ErrorActions'
 
 type post = {
@@ -14,12 +14,13 @@ type post = {
 }
 
 const EditPost: React.FC = () => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
   const [post, setPost] = useState<post>()
   const [isLoading, setIsLoading] = useState(true)
+
   const [GetPost] = useLazyQuery(GetPostQuery)
   const [EditPost] = useMutation(EditPostMutation)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const search = window.location.search
   let id = parseInt(new URLSearchParams(search).get('id') || '')

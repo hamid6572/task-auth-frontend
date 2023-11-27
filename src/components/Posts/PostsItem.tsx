@@ -18,19 +18,20 @@ type PostItemProps = {
 }
 
 const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
-  const token = localStorage.getItem('token')
-  const { id, title, content, user } = post
-  const [GetComments] = useLazyQuery(GetCommentsQuery)
-  const [GetComment] = useLazyQuery(GetCommentQuery)
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
   const [comments, setComments] = useState<comment[]>([])
   const [showComments, setShowComments] = useState(false)
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(3)
   const [socket, setSocket] = useState<Socket>()
+
+  const token = localStorage.getItem('token')
+  const { id, title, content, user } = post
+
+  const [GetComments] = useLazyQuery(GetCommentsQuery)
+  const [GetComment] = useLazyQuery(GetCommentQuery)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const connectSocket = () => {
     const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL || '', {

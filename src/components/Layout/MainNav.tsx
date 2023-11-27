@@ -9,9 +9,10 @@ import { setError } from '../../redux/actions/ErrorActions'
 import { GlobalSearchQuery } from '../../apis/posts'
 
 const MainNav: React.FC = () => {
-  const [searchPosts] = useLazyQuery(GlobalSearchQuery)
   const [searchText, setSearchText] = useState('')
   const [searchResults, setSearchResults] = useState(null)
+  const [searchPosts] = useLazyQuery(GlobalSearchQuery)
+
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()

@@ -15,12 +15,12 @@ type post = {
 }
 
 const CreatePost: React.FC = () => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
   const titleref = useRef<HTMLInputElement | null>(null)
   const descriptionref = useRef<HTMLInputElement | null>(null)
+
   const [createPost] = useMutation(CreatePostMutation)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const createPostAPIHandeler = async (post: post) => {
     try {
@@ -30,7 +30,7 @@ const CreatePost: React.FC = () => {
       if (data?.createPost.message) {
         dispatch(setError(data?.createPost.message))
         setTimeout(() => {
-          navigate('/dashboard')
+          navigate('/dashboard', { state: { post } })
         }, 1000)
       }
     } catch (err) {
