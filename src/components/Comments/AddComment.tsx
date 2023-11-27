@@ -14,9 +14,9 @@ export type AddCommentProps = {
 }
 
 const AddComment: React.FC<AddCommentProps> = ({ post, socket }) => {
-  const dispatch = useDispatch()
   const [newComment, setNewComment] = useState('')
   const [addComment] = useMutation(AddCommentMutation)
+  const dispatch = useDispatch()
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {

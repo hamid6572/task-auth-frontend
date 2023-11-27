@@ -25,11 +25,12 @@ type SignupVariables = {
 }
 
 const Authentication: React.FC = () => {
-  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState(0)
   const [registerUser] = useMutation<SignupData, SignupVariables>(SignupMutation)
   const [loginUser] = useMutation(LoginMutation)
+
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const signInHandler = async userData => {
     try {

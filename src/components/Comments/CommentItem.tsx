@@ -13,12 +13,14 @@ export type CommentItemProps = {
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
-  const [GetCommentsReplies] = useLazyQuery(GetCommentsRepliesQuery)
   const [replies, setReplies] = useState<comment[]>([])
   const [showReplies, setShowReplies] = useState(false)
   const [currentPage, setCurrentPage] = useState(2)
   const [pageSize] = useState(2)
+
+  const [GetCommentsReplies] = useLazyQuery(GetCommentsRepliesQuery)
   const dispatch = useDispatch()
+
   useEffect(() => {
     if (comment.replies && Array.isArray(comment.replies)) {
       const firstTwoReplies = comment.replies.slice(0, 2)
@@ -35,7 +37,6 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
         page: (currentPage - 1) * pageSize
       }
     })
-    if (error) throw error
     return data
   }
 

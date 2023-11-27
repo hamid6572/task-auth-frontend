@@ -17,6 +17,7 @@
     "@types/react-dom": "^18.2.17",
     "fs": "^0.0.1-security",
     "graphql": "^16.8.1",
+    "lodash": "^4.17.21",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-loader-spinner": "^5.1.5",
