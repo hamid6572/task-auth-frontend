@@ -1,10 +1,6 @@
-import { comment } from '../../types/comment'
-import CommentItem from './CommentItem'
 import React from 'react'
-
-export type CommentListProps = {
-  comments: comment[]
-}
+import CommentItem from './CommentItem'
+import { CommentListProps } from '../../types/props'
 
 const CommentList: React.FC<CommentListProps> = props => {
   return (

@@ -1,68 +1,67 @@
-import React, { useRef } from 'react'
-import { TextField, Button, Box } from '@mui/material'
+import React from 'react'
+import { Button, FormControl, InputLabel, OutlinedInput, FormHelperText, Box } from '@mui/material'
+import { useForm, SubmitHandler } from 'react-hook-form'
 
-type SignupProps = {
-  signupHandler: (data) => void
-}
+import { SignupFormValues, SignupProps } from '../../types'
 
 const Signup: React.FC<SignupProps> = props => {
-  let emailRef = useRef<HTMLInputElement | null>(null)
-  let passwordRef = useRef<HTMLInputElement | null>(null)
-  let firstNameRef = useRef<HTMLInputElement | null>(null)
-  let lastNameRef = useRef<HTMLInputElement | null>(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<SignupFormValues>()
 
-  const signupHandler = () => {
-    const userData = {
-      firstName: firstNameRef.current?.value,
-      lastName: lastNameRef.current?.value,
-      email: emailRef.current?.value,
-      password: passwordRef.current?.value
-    }
-    props.signupHandler(userData)
+  const onSubmit: SubmitHandler<SignupFormValues> = data => {
+    props.signupHandler(data)
   }
 
   return (
-    <Box sx={{ maxWidth: 300, margin: 'auto' }}>
-      <TextField
-        id='signupfirstname'
-        label='First Name'
-        type='text'
-        inputRef={firstNameRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-      <TextField
-        id='signuplastname'
-        label='Last Name'
-        type='text'
-        inputRef={lastNameRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-
-      <TextField
-        id='loginemail'
-        label='Email'
-        type='email'
-        inputRef={emailRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-      <TextField
-        id='loginpassword'
-        label='Password'
-        type='password'
-        inputRef={passwordRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-      <Button variant='contained' color='primary' fullWidth onClick={signupHandler} sx={{ mt: 2 }}>
-        Sign Up
-      </Button>
+    <Box>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='signupfirstname'>First Name</InputLabel>
+          <OutlinedInput
+            id='signupfirstname'
+            type='text'
+            {...register('firstName', { required: 'First Name is required' })}
+            label='First Name'
+          />
+          <FormHelperText error={!!errors.firstName}>{errors.firstName?.message}</FormHelperText>
+        </FormControl>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='signuplastname'>Last Name</InputLabel>
+          <OutlinedInput
+            id='signuplastname'
+            type='text'
+            {...register('lastName', { required: 'Last Name is required' })}
+            label='Last Name'
+          />
+          <FormHelperText error={!!errors.lastName}>{errors.lastName?.message}</FormHelperText>
+        </FormControl>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='signupemail'>Email</InputLabel>
+          <OutlinedInput
+            id='signupemail'
+            type='email'
+            {...register('email', { required: 'Email is required' })}
+            label='Email'
+          />
+          <FormHelperText error={!!errors.email}>{errors.email?.message}</FormHelperText>
+        </FormControl>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='signuppassword'>Password</InputLabel>
+          <OutlinedInput
+            id='signuppassword'
+            type='password'
+            {...register('password', { required: 'Password is required' })}
+            label='Password'
+          />
+          <FormHelperText error={!!errors.password}>{errors.password?.message}</FormHelperText>
+        </FormControl>
+        <Button variant='contained' color='primary' fullWidth type='submit' sx={{ mt: 2 }}>
+          Sign Up
+        </Button>
+      </form>
     </Box>
   )
 }

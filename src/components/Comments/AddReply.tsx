@@ -4,27 +4,23 @@ import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
 import { AddReplyToCommentMutation } from '../../apis/comments'
-import { comment } from '../../types/comment'
 import { setError } from '../../redux/actions/ErrorActions'
-
-export type AddReplyProps = {
-  postId: number
-  commentId: number
-  setReplies: React.Dispatch<React.SetStateAction<comment[]>>
-}
+import { ALERT, ERROR } from '../../enums'
+import { AddReplyProps, AddReplyToCommentResponse, AddReplyToCommentVariables } from '../../types'
 
 const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) => {
   const [newReply, setNewReply] = useState('')
-  const [addReply] = useMutation(AddReplyToCommentMutation)
+  const [addReply] = useMutation<AddReplyToCommentResponse, AddReplyToCommentVariables>(
+    AddReplyToCommentMutation
+  )
   const dispatch = useDispatch()
 
   const handleAddReply = async () => {
     if (!newReply.trim()) {
-      dispatch(setError('Please enter a reply.'))
+      dispatch(setError(ERROR.ENTER_REPLY))
       return
     }
     try {
-      console.log(postId, commentId)
       const { data } = await addReply({
         variables: {
           commentId: commentId,
@@ -34,12 +30,12 @@ const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) =>
       })
 
       if (data?.addReplyToComment) {
-        dispatch(setError('Reply added successfully'))
+        dispatch(setError(ALERT.REPLY_INSERTED))
         setReplies(prevReplies => [...prevReplies, data.addReplyToComment])
         setNewReply('')
       }
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred while adding a reply.'))
+      dispatch(setError(err.message || ERROR.ENTER_REPLY))
     }
   }
 

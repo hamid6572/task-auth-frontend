@@ -1,45 +1,51 @@
-import React, { useRef } from 'react'
-import { TextField, Button, Box } from '@mui/material'
+import React from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { Button, FormControl, InputLabel, OutlinedInput, FormHelperText, Box } from '@mui/material'
 
-type LoginProps = {
-  signInHandler: (data) => void
-}
+import { LoginFormValues, LoginProps } from '../../types'
 
 const Login: React.FC<LoginProps> = props => {
-  let emailRef = useRef<HTMLInputElement | null>(null)
-  let passwordRef = useRef<HTMLInputElement | null>(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginFormValues>()
 
-  const signinHandler = () => {
-    const userData = {
-      email: emailRef.current?.value || '',
-      password: passwordRef.current?.value || ''
-    }
-    props.signInHandler(userData)
+  const onSubmit: SubmitHandler<LoginFormValues> = data => {
+    props.signInHandler(data)
   }
 
   return (
-    <Box sx={{ maxWidth: 300, margin: 'auto' }}>
-      <TextField
-        id='loginemail'
-        label='Email'
-        type='email'
-        inputRef={emailRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-      <TextField
-        id='loginpassword'
-        label='Password'
-        type='password'
-        inputRef={passwordRef}
-        fullWidth
-        variant='outlined'
-        margin='normal'
-      />
-      <Button variant='contained' color='primary' fullWidth onClick={signinHandler} sx={{ mt: 2 }}>
-        Sign In
-      </Button>
+    <Box>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='loginemail'>Email</InputLabel>
+          <OutlinedInput
+            id='loginemail'
+            type='email'
+            {...register('email', { required: 'Email is required' })}
+            label='Email'
+          />
+          <FormHelperText error={errors.email && errors.email?.type === 'required'}>
+            {errors.email?.type === 'required' && 'Email is required'}
+          </FormHelperText>
+        </FormControl>
+        <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
+          <InputLabel htmlFor='loginpassword'>Password</InputLabel>
+          <OutlinedInput
+            id='loginpassword'
+            type='password'
+            {...register('password', { required: 'Password is required' })}
+            label='Password'
+          />
+          <FormHelperText error={errors.password && errors.password?.type === 'required'}>
+            {errors.password?.type === 'required' && 'Password is required'}
+          </FormHelperText>
+        </FormControl>
+        <Button variant='contained' color='primary' fullWidth type='submit' sx={{ mt: 2 }}>
+          Sign In
+        </Button>
+      </form>
     </Box>
   )
 }

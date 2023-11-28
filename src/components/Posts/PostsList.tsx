@@ -1,11 +1,6 @@
 import React from 'react'
 import PostsItem from './PostsItem'
-import { Post } from '../../types/post'
-
-export type PostListProps = {
-  posts: Post[]
-  deleteHandler: (id: number) => void
-}
+import { PostListProps } from '../../types/props'
 
 const PostList: React.FC<PostListProps> = props => {
   return (

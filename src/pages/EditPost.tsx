@@ -7,18 +7,22 @@ import { TextField, Button, Container, Typography, Box, CircularProgress } from 
 import { EditPostMutation, GetPostQuery } from '../apis/posts'
 import Layout from '../components/Layout/Layout'
 import { setError } from '../redux/actions/ErrorActions'
-
-type post = {
-  title: string
-  content: string
-}
+import { ERROR, ROUTE } from '../enums'
+import {
+  EditPostResponse,
+  EditPostVariables,
+  GetPostResponse,
+  GetPostVariables,
+  Post
+} from '../types'
 
 const EditPost: React.FC = () => {
-  const [post, setPost] = useState<post>()
+  const [post, setPost] = useState<Post>()
   const [isLoading, setIsLoading] = useState(true)
 
-  const [GetPost] = useLazyQuery(GetPostQuery)
-  const [EditPost] = useMutation(EditPostMutation)
+  const [GetPost] = useLazyQuery<GetPostResponse, GetPostVariables>(GetPostQuery)
+  const [EditPost] = useMutation<EditPostResponse, EditPostVariables>(EditPostMutation)
+
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -33,9 +37,9 @@ const EditPost: React.FC = () => {
         }
       })
       if (error) throw error
-      return data.getPost
+      return data?.getPost
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
 
@@ -50,9 +54,9 @@ const EditPost: React.FC = () => {
         }
       })
 
-      return data.updatePost
+      return data?.updatePost
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
 
@@ -79,15 +83,15 @@ const EditPost: React.FC = () => {
     if (updatedPostResult) {
       dispatch(setError(updatedPostResult.message))
       setTimeout(() => {
-        navigate('/posts')
+        navigate(ROUTE.DASHBOARD, { state: { post: updatedPost } })
       }, 1000)
     }
   }
 
-  const cancelPostHandler = () => navigate('/posts')
+  const cancelPostHandler = () => navigate(ROUTE.DASHBOARD)
 
   return (
-    <div>
+    <Box>
       <Layout />
       {isLoading ? (
         <Box
@@ -142,7 +146,7 @@ const EditPost: React.FC = () => {
           </Box>
         </Container>
       )}
-    </div>
+    </Box>
   )
 }
 

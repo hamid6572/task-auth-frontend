@@ -9,3 +9,8 @@ export const setError = (errorMessage: String) => ({
 export const clearError = () => ({
   type: CLEAR_ERROR
 })
+
+export const setAlert = (message: String) => ({
+  type: SET_ERROR,
+  payload: message
+})

@@ -1,106 +1,103 @@
-import React, { useRef } from 'react'
+import React from 'react'
+import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import { TextField, Button, Container, Typography } from '@mui/material'
+import { Button, Container, Typography, Box, FormControl, FormHelperText } from '@mui/material'
+import { TextField } from '@mui/material'
 
 import Layout from '../components/Layout/Layout'
-import { Toastcontainer } from '../tools/toast'
 import { CreatePostMutation } from '../apis/posts'
 import { setError } from '../redux/actions/ErrorActions'
-
-type post = {
-  title: string
-  content: string
-}
+import { ERROR, ROUTE } from '../enums'
+import { CreatePostResponse, CreatePostVariables, PostFormValues } from '../types'
 
 const CreatePost: React.FC = () => {
-  const titleref = useRef<HTMLInputElement | null>(null)
-  const descriptionref = useRef<HTMLInputElement | null>(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<PostFormValues>()
+  const [createPost] = useMutation<CreatePostResponse, CreatePostVariables>(CreatePostMutation)
 
-  const [createPost] = useMutation(CreatePostMutation)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const createPostAPIHandeler = async (post: post) => {
+  const createPostAPIHandler = async (formData: PostFormValues) => {
     try {
       const { data } = await createPost({
-        variables: { input: { ...post } }
+        variables: { input: { ...formData } }
       })
       if (data?.createPost.message) {
         dispatch(setError(data?.createPost.message))
         setTimeout(() => {
-          navigate('/dashboard', { state: { post } })
+          navigate(ROUTE.DASHBOARD, { state: { post: formData } })
         }, 1000)
       }
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
 
-  const createPostHandler = () => {
-    createPostAPIHandeler({
-      title: titleref.current?.value || '',
-      content: descriptionref.current?.value || ''
-    })
-  }
+  const createPostHandler = handleSubmit(formData => {
+    createPostAPIHandler(formData)
+  })
 
-  const cancelPostHandler = () => navigate('/posts')
+  const cancelPostHandler = () => navigate(ROUTE.DASHBOARD)
 
   return (
-    <div>
+    <Box>
       <Layout />
       <Container>
-        <div className='row'>
-          <div className='col-md-8 col-md-offset-2'>
+        <Box className='row'>
+          <Box className='col-md-8 col-md-offset-2'>
             <Typography variant='h4' gutterBottom>
               Create post
             </Typography>
 
-            <div>
-              <TextField
-                required
-                id='posttitle'
-                data-testid='posttitle'
-                type='text'
-                className='form-control my-2'
-                placeholder='Title'
-                inputRef={titleref}
-              />
-            </div>
-            <div>
-              <TextField
-                multiline
-                rows={5}
-                className='form-control my-2'
-                placeholder='Content'
-                inputRef={descriptionref}
-              />
-            </div>
-            <div className='form-group'>
-              <Button
-                type='submit'
-                data-testid='postbutton'
-                onClick={createPostHandler}
-                variant='contained'
-                color='primary'
-              >
-                Create Post
-              </Button>
-              <Button
-                variant='contained'
-                color='primary'
-                sx={{ marginLeft: '8px' }}
-                onClick={cancelPostHandler}
-              >
-                Cancel
-              </Button>
-              <Toastcontainer />
-            </div>
-          </div>
-        </div>
+            <form onSubmit={createPostHandler}>
+              <FormControl fullWidth>
+                <TextField
+                  id='posttitle'
+                  data-testid='posttitle'
+                  type='text'
+                  placeholder='Title'
+                  {...register('title', { required: 'Title is required' })}
+                  className='form-control my-2'
+                />
+                <FormHelperText error>{errors.title?.message}</FormHelperText>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <TextField
+                  multiline
+                  minRows={5}
+                  maxRows={10}
+                  placeholder='Content'
+                  {...register('content', { required: 'Content is required' })}
+                  className='form-control my-2'
+                />
+                <FormHelperText error>{errors.content?.message}</FormHelperText>
+              </FormControl>
+
+              <Box className='form-group'>
+                <Button type='submit' data-testid='postbutton' variant='contained' color='primary'>
+                  Create Post
+                </Button>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  sx={{ marginLeft: '8px' }}
+                  onClick={cancelPostHandler}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </form>
+          </Box>
+        </Box>
       </Container>
-    </div>
+    </Box>
   )
 }
 

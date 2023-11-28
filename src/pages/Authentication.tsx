@@ -7,27 +7,14 @@ import { useMutation } from '@apollo/client'
 import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
 import { LoginMutation, SignupMutation } from '../apis/auth'
-import { User } from '../types/user'
 import { setError } from '../redux/actions/ErrorActions'
-
-type SignupData = {
-  register: {
-    token: string
-    user: User
-  }
-}
-
-type SignupVariables = {
-  email: string
-  firstName: string
-  lastName: string
-  password: string
-}
+import { ERROR, ROUTE } from '../enums'
+import { LoginResponse, LoginVariables, SignupResponse, SignupVariables } from '../types'
 
 const Authentication: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0)
-  const [registerUser] = useMutation<SignupData, SignupVariables>(SignupMutation)
-  const [loginUser] = useMutation(LoginMutation)
+  const [registerUser] = useMutation<SignupResponse, SignupVariables>(SignupMutation)
+  const [loginUser] = useMutation<LoginResponse, LoginVariables>(LoginMutation)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -41,10 +28,10 @@ const Authentication: React.FC = () => {
         localStorage.setItem('token', data.login.token)
         localStorage.setItem('userId', data.login.user.id)
 
-        navigate('Dashboard')
+        navigate(ROUTE.DASHBOARD)
       }
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
 
@@ -58,12 +45,12 @@ const Authentication: React.FC = () => {
 
       if (data?.register.token) {
         localStorage.setItem('token', data.register.token)
-        localStorage.setItem('userId', data.register.user.id)
+        localStorage.setItem('userId', data.register.user.id.toString())
 
-        navigate('Dashboard')
+        navigate(ROUTE.DASHBOARD)
       }
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
   const handleTabChange = (event, newValue) => {

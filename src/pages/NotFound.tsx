@@ -1,19 +1,20 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Box, Typography, Link as MuiLink } from '@mui/material'
 
 const NotFound: React.FC = () => {
   return (
-    <div className='text-center h1 my-3 '>
-      <p>Page does not Exist!</p>
-      <p>
+    <Box sx={{ textAlign: 'center', my: 3 }}>
+      <Typography variant='h4'>Page does not Exist!</Typography>
+      <Typography variant='body1'>
         Click to go to{' '}
         <span>
-          <Link className='link-primary' to='/'>
+          <MuiLink component={Link} to='/' color='primary'>
             Login Page.
-          </Link>
+          </MuiLink>
         </span>
-      </p>
-    </div>
+      </Typography>
+    </Box>
   )
 }
 
