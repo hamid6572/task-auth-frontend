@@ -1,10 +1,18 @@
 import { Post } from './post'
 import { User } from './user'
 
-export type comment = {
+export type Comment = {
   id: number
   text: string
   post: Post
   user: User
-  replies: comment[]
+  replies: Comment[]
+}
+
+export type Reply = {
+  id: number
+  text: string
+  post: Post
+  user: User
+  replies: Comment[]
 }

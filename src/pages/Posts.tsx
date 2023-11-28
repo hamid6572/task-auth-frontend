@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Box, CircularProgress, Skeleton, Typography } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { debounce } from 'lodash'
 
@@ -8,17 +8,63 @@ import { DeletePostMutation, GetPaginatedPostsQuery } from '../apis/posts'
 import PostsList from '../components/Posts/PostsList'
 import { Post } from '../types/post'
 import { setError } from '../redux/actions/ErrorActions'
-import { useLocation } from 'react-router-dom'
+import { ERROR } from '../enums'
+import {
+  DeletePostResponse,
+  DeletePostVariables,
+  PaginatedPostsResponse,
+  PaginatedPostsVariables
+} from '../types'
 
-const Posts: React.FC = () => {
+type PostProps = {
+  state: any
+}
+
+const Posts: React.FC<PostProps> = ({ state }) => {
   const [posts, setPosts] = useState<Post[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(4)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingPagination, setIsLoadingPagination] = useState(false)
 
-  const [getPaginatedPosts] = useLazyQuery(GetPaginatedPostsQuery)
-  const [DeletePost] = useMutation(DeletePostMutation)
+  const [getPaginatedPosts] = useLazyQuery<PaginatedPostsResponse, PaginatedPostsVariables>(
+    GetPaginatedPostsQuery
+  )
+  const [DeletePost] = useMutation<DeletePostResponse, DeletePostVariables>(DeletePostMutation)
+
   const dispatch = useDispatch()
-  const { state } = useLocation()
+  const pageSize = 4
+
+  const fetchData = async () => {
+    const { data } = await getPaginatedPosts({
+      variables: {
+        itemsPerPage: pageSize,
+        page: (currentPage - 1) * pageSize
+      }
+    })
+
+    return (
+      data || {
+        paginatedPosts: []
+      }
+    ).paginatedPosts
+  }
+
+  const handleViewPosts = async () => {
+    try {
+      let data = await fetchData()
+      setPosts(prevData => [...prevData, ...data])
+
+      if (data?.length === 0 || data?.length < pageSize) {
+        dispatch(setError(ERROR.NO_FURTHER_POSTS))
+        setIsLoadingPagination(false)
+        setCurrentPage(1)
+      }
+
+      setCurrentPage(currentPage + 1)
+    } catch (err) {
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
+    }
+  }
 
   const handleScroll = debounce(() => {
     const windowHeight = window.innerHeight
@@ -37,27 +83,12 @@ const Posts: React.FC = () => {
     }
   }, [handleScroll])
 
-  const fetchData = async () => {
-    try {
-      const { data } = await getPaginatedPosts({
-        variables: {
-          itemsPerPage: pageSize,
-          page: (currentPage - 1) * pageSize
-        }
-      })
-      return data
-    } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
-    }
-  }
-  let data = {
-    paginatedPosts: []
-  }
   const fetch = async () => {
-    data = await fetchData().catch(error =>
-      dispatch(setError(error.message || 'An error occurred'))
-    )
-    setPosts(prevData => [...prevData, ...data?.paginatedPosts])
+    let data = await fetchData()
+    setIsLoading(false)
+    setIsLoadingPagination(true)
+
+    setPosts(prevData => [...prevData, ...data])
   }
 
   useEffect(() => {
@@ -65,19 +96,7 @@ const Posts: React.FC = () => {
     setCurrentPage(currentPage + 1)
 
     // eslint-disable-next-line
-  }, [state?.post])
-
-  const handleViewPosts = async () => {
-    let data = await fetchData()
-
-    setPosts(prevData => [...prevData, ...data.paginatedPosts])
-    if (data?.paginatedPosts.length === 0 || data?.paginatedPosts.length < pageSize) {
-      dispatch(setError('No further Posts!'))
-      setCurrentPage(1)
-    }
-
-    setCurrentPage(currentPage + 1)
-  }
+  }, [])
 
   const resetPosts = id => {
     let renewdPosts = posts.filter(post => post.id !== parseInt(id))
@@ -93,7 +112,7 @@ const Posts: React.FC = () => {
       })
       if (data) resetPosts(id)
     } catch (err) {
-      dispatch(setError(err.message || 'An error occurred'))
+      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
   const deleteHandler = (id: number) => {
@@ -101,8 +120,8 @@ const Posts: React.FC = () => {
   }
 
   return (
-    <div>
-      {posts.length === 0 ? (
+    <Box>
+      {isLoading ? (
         <Box
           sx={{
             display: 'flex',
@@ -114,11 +133,23 @@ const Posts: React.FC = () => {
           <CircularProgress color='primary' />
         </Box>
       ) : (
-        <div>
+        <Box>
           <PostsList posts={posts} deleteHandler={deleteHandler} />
-        </div>
+          {isLoadingPagination && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '7vh'
+              }}
+            >
+              <CircularProgress color='primary' />
+            </Box>
+          )}
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }
 

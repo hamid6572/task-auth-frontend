@@ -1,16 +1,14 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
+import { Box } from '@mui/material'
+import { LayoutRouteProps } from 'react-router-dom'
 import MainNav from './MainNav'
 
-interface LayoutProps {
-  children?: ReactNode
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutRouteProps> = ({ children }) => {
   return (
-    <div>
+    <Box>
       <MainNav />
       <main>{children}</main>
-    </div>
+    </Box>
   )
 }
 

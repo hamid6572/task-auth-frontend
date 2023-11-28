@@ -79,7 +79,7 @@ export const GlobalSearchQuery = gql`
 `
 
 export const GetPostQuery = gql`
-  query GetPost($id: Float!) {
+  query GetPost($id: Int!) {
     getPost(id: $id) {
       title
       content
@@ -95,7 +95,7 @@ export const GetPostQuery = gql`
 `
 
 export const EditPostMutation = gql`
-  mutation UpdatePost($id: Float!, $input: postInput!) {
+  mutation UpdatePost($id: Int!, $input: postInput!) {
     updatePost(id: $id, data: $input) {
       message
     }
@@ -103,7 +103,7 @@ export const EditPostMutation = gql`
 `
 
 export const DeletePostMutation = gql`
-  mutation DeletePost($id: Float!) {
+  mutation DeletePost($id: Int!) {
     deletePost(id: $id) {
       message
     }
