@@ -6,7 +6,6 @@ import { useLocation } from 'react-router-dom'
 
 const MainPage: React.FC = () => {
   const { state } = useLocation()
-  console.log(state)
 
   return (
     <Layout>

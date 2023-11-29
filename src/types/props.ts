@@ -39,3 +39,7 @@ export type AddCommentProps = {
   post: Post
   socket: Socket | undefined
 }
+
+export type PostProps = {
+  isEdit?: boolean
+}

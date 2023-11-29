@@ -33,6 +33,7 @@ const Posts: React.FC<PostProps> = ({ state }) => {
 
   const dispatch = useDispatch()
   const pageSize = 4
+  //console.log('->', state)
 
   const fetchData = async () => {
     const { data } = await getPaginatedPosts({
@@ -52,8 +53,12 @@ const Posts: React.FC<PostProps> = ({ state }) => {
   const handleViewPosts = async () => {
     try {
       let data = await fetchData()
-      setPosts(prevData => [...prevData, ...data])
+      setPosts(prevData => {
+        console.log('prevData from scroll', prevData)
+        console.log(data)
 
+        return [...prevData, ...data]
+      })
       if (data?.length === 0 || data?.length < pageSize) {
         dispatch(setError(ERROR.NO_FURTHER_POSTS))
         setIsLoadingPagination(false)
@@ -81,14 +86,19 @@ const Posts: React.FC<PostProps> = ({ state }) => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [handleScroll])
+  }, [handleScroll, state?.post?.title, state?.post?.id])
 
   const fetch = async () => {
     let data = await fetchData()
     setIsLoading(false)
-    setIsLoadingPagination(true)
+    if (data?.length !== 0 && data?.length >= pageSize) setIsLoadingPagination(true)
 
-    setPosts(prevData => [...prevData, ...data])
+    setPosts(prevData => {
+      console.log('prevData', prevData)
+      console.log(data)
+
+      return [...prevData, ...data]
+    })
   }
 
   useEffect(() => {
@@ -96,7 +106,7 @@ const Posts: React.FC<PostProps> = ({ state }) => {
     setCurrentPage(currentPage + 1)
 
     // eslint-disable-next-line
-  }, [])
+  }, [state?.post?.title, state?.post?.id])
 
   const resetPosts = id => {
     let renewdPosts = posts.filter(post => post.id !== parseInt(id))
@@ -115,6 +125,7 @@ const Posts: React.FC<PostProps> = ({ state }) => {
       dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
     }
   }
+
   const deleteHandler = (id: number) => {
     deletePost(id)
   }

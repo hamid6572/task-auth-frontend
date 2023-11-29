@@ -29,6 +29,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   useEffect(() => {
     if (comment.replies) {
       const firstTwoReplies = comment.replies.slice(0, 2)
+      if (comment.replies.length > 0) setShowReplies(prevState => !prevState)
       setReplies(firstTwoReplies)
     }
     // eslint-disable-next-line
@@ -69,19 +70,22 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
       <Typography variant='body1' gutterBottom>
         {comment.text}, {comment.id}
       </Typography>
-      {comment?.replies?.length > 0 && (
+      {comment?.replies?.length >= 0 && (
         <Box>
           {replies.map(reply => (
             <Typography key={reply.id} color='textSecondary' sx={{ marginLeft: 4 }}>
               {reply.text}, {reply.id}
             </Typography>
           ))}
-          <Button variant='text' color='primary' onClick={handleViewReplies}>
-            {showReplies ? null : 'View More Replies'}
-          </Button>
-          <AddReply postId={comment.post?.id} commentId={comment.id} setReplies={setReplies} />
+
+          {showReplies && (
+            <Button variant='text' color='primary' onClick={handleViewReplies}>
+              View More Replies
+            </Button>
+          )}
         </Box>
       )}
+      <AddReply postId={comment.post?.id} commentId={comment.id} setReplies={setReplies} />
     </Box>
   )
 }

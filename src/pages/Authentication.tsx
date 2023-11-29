@@ -45,7 +45,7 @@ const Authentication: React.FC = () => {
 
       if (data?.register.token) {
         localStorage.setItem('token', data.register.token)
-        localStorage.setItem('userId', data.register.user.id.toString())
+        localStorage.setItem('userId', data.register.user.id?.toString())
 
         navigate(ROUTE.DASHBOARD)
       }

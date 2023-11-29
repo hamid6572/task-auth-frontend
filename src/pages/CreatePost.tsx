@@ -58,8 +58,8 @@ const CreatePost: React.FC = () => {
             <form onSubmit={createPostHandler}>
               <FormControl fullWidth>
                 <TextField
-                  id='posttitle'
-                  data-testid='posttitle'
+                  id='postTitle'
+                  data-testid='postTitle'
                   type='text'
                   placeholder='Title'
                   {...register('title', { required: 'Title is required' })}
