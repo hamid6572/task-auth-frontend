@@ -47,7 +47,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
       newSocket.emit('joinPostRoom', id)
     })
 
-    newSocket.on('newComment', async commentId => {
+    newSocket.on('newComment', async (postId, commentId) => {
       let newComment = await fetchComment(commentId)
       console.log('Received new comment:', newComment)
 
@@ -130,7 +130,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
               Posted By: {user?.firstName}
             </Typography>
 
-            {user?.id.toString() === localStorage.getItem('userId') && (
+            {user?.id?.toString() === localStorage.getItem('userId') && (
               <Box style={{ marginTop: '1rem' }}>
                 <Button variant='outlined' color='success' onClick={editHandler}>
                   Edit

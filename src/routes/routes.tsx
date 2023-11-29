@@ -1,7 +1,15 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { EditPost, CreatePost, Dashboard, NotFound, Authentication, SearchResults } from '../pages'
+import {
+  EditPost,
+  CreatePost,
+  Dashboard,
+  NotFound,
+  Authentication,
+  SearchResults,
+  PostForm
+} from '../pages'
 import ProtectedRoute from './protected.routes'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -14,9 +22,8 @@ const Routers: React.FC = () => (
     <Route path={ROUTE.DASHBOARD} element={<Dashboard />} />
 
     <Route element={<ProtectedRoute />}>
-      <Route path={ROUTE.CREATE_POST} element={<CreatePost />} />
-
-      <Route path={ROUTE.EDIT_POST} element={<EditPost />} />
+      <Route path={ROUTE.CREATE_POST} element={<PostForm />} />
+      <Route path={ROUTE.EDIT_POST} element={<PostForm />} />
       <Route path={ROUTE.SEARCH} element={<SearchResults />} />
     </Route>
 

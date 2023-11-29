@@ -4,6 +4,7 @@ export const CreatePostMutation = gql`
   mutation CreatePost($input: postInput!) {
     createPost(data: $input) {
       message
+      id
     }
   }
 `
@@ -81,6 +82,7 @@ export const GlobalSearchQuery = gql`
 export const GetPostQuery = gql`
   query GetPost($id: Int!) {
     getPost(id: $id) {
+      id
       title
       content
       user {
@@ -98,6 +100,7 @@ export const EditPostMutation = gql`
   mutation UpdatePost($id: Int!, $input: postInput!) {
     updatePost(id: $id, data: $input) {
       message
+      id
     }
   }
 `

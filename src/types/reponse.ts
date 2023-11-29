@@ -21,12 +21,14 @@ export type LoginResponse = {
 export type CreatePostResponse = {
   createPost: {
     message: string
+    id: number
   }
 }
 
 export type EditPostResponse = {
   updatePost: {
     message: string
+    id: number
   }
 }
 

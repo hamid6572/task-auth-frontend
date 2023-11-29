@@ -39,7 +39,8 @@ import {
   CommentItemProps,
   AddReplyProps,
   AddCommentProps,
-  SignupProps
+  SignupProps,
+  PostProps
 } from './props'
 export {
   Comment,
@@ -51,6 +52,7 @@ export {
   CommentListProps,
   CommentItemProps,
   AddReplyProps,
+  PostProps,
   LoginProps,
   SignupProps,
   AddCommentProps,
