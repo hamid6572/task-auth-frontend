@@ -1,23 +1,21 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useContext, useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
 import { AddReplyToCommentMutation } from '../../apis/comments'
-import { setError } from '../../redux/actions/ErrorActions'
 import { ALERT, ERROR } from '../../enums'
 import { AddReplyProps, AddReplyToCommentResponse, AddReplyToCommentVariables } from '../../types'
+import { ErrorContext } from '../../context/ErrorProvider'
 
 const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) => {
   const [newReply, setNewReply] = useState('')
   const [addReply] = useMutation<AddReplyToCommentResponse, AddReplyToCommentVariables>(
     AddReplyToCommentMutation
   )
-  const dispatch = useDispatch()
-
+  const { handleError } = useContext(ErrorContext)
   const handleAddReply = async () => {
     if (!newReply.trim()) {
-      dispatch(setError(ERROR.ENTER_REPLY))
+      handleError(ERROR.ENTER_REPLY)
       return
     }
     try {
@@ -30,12 +28,12 @@ const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) =>
       })
 
       if (data?.addReplyToComment) {
-        dispatch(setError(ALERT.REPLY_INSERTED))
+        handleError(ALERT.REPLY_INSERTED)
         setReplies(prevReplies => [...prevReplies, data.addReplyToComment])
         setNewReply('')
       }
     } catch (err) {
-      dispatch(setError(err.message || ERROR.ENTER_REPLY))
+      handleError(err.message || ERROR.ENTER_REPLY)
     }
   }
 

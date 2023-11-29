@@ -1,24 +1,18 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import {
-  EditPost,
-  CreatePost,
-  Dashboard,
-  NotFound,
-  Authentication,
-  SearchResults,
-  PostForm
-} from '../pages'
+import { Dashboard, NotFound, Login, SearchResults, PostForm, SignUp } from '../pages'
 import ProtectedRoute from './protected.routes'
 
-import 'react-toastify/dist/ReactToastify.css'
 import '../App.css'
 import { ROUTE } from '../enums/routes'
 
 const Routers: React.FC = () => (
   <Routes>
-    <Route path='/' element={<Authentication />} />
+    <Route path='/' element={<Login />} />
+    <Route path='/login' element={<Login />} />
+    <Route path='/signup' element={<SignUp />} />
+
     <Route path={ROUTE.DASHBOARD} element={<Dashboard />} />
 
     <Route element={<ProtectedRoute />}>

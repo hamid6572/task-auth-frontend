@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState, useEffect, useContext } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 
 import { GetCommentsRepliesQuery } from '../../apis/comments'
 import AddReply from './AddReply'
-import { setError } from '../../redux/actions/ErrorActions'
 import { ERROR } from '../../enums'
 import {
   Reply,
@@ -13,6 +11,7 @@ import {
   GetCommentsRepliesVariables,
   CommentItemProps
 } from '../../types'
+import { ErrorContext } from '../../context/ErrorProvider'
 
 const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   const [replies, setReplies] = useState<Reply[]>([])
@@ -24,7 +23,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
     GetCommentsRepliesResponse,
     GetCommentsRepliesVariables
   >(GetCommentsRepliesQuery)
-  const dispatch = useDispatch()
+  const { handleError } = useContext(ErrorContext)
 
   useEffect(() => {
     if (comment.replies) {
@@ -48,17 +47,17 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
 
   const handleViewReplies = async () => {
     try {
-      let data = await fetchReplies()
+      const data = await fetchReplies()
 
       if (data?.length === 0 || data?.length < pageSize) {
         setShowReplies(prevState => !prevState)
         setCurrentPage(1)
-        dispatch(setError(ERROR.NO_FURTHER_REPLIES))
+        handleError(ERROR.NO_FURTHER_REPLIES)
       }
       setReplies(prevData => [...prevData, ...data])
       setCurrentPage(currentPage + 1)
     } catch (error) {
-      dispatch(setError(error.message || ERROR.GLOBAL_MESSAGE))
+      handleError(error.message || ERROR.GLOBAL_MESSAGE)
     }
   }
 

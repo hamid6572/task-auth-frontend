@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useContext, useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
 import { AddCommentMutation } from '../../apis/comments'
-import { setAlert, setError } from '../../redux/actions/ErrorActions'
 import { ALERT, ERROR } from '../../enums'
 import { AddCommentProps, AddCommentResponse, AddCommentVariables } from '../../types'
+import { ErrorContext } from '../../context/ErrorProvider'
 
 const AddComment: React.FC<AddCommentProps> = ({ post, socket }) => {
   const [newComment, setNewComment] = useState('')
+
   const [addComment] = useMutation<AddCommentResponse, AddCommentVariables>(AddCommentMutation)
-  const dispatch = useDispatch()
+  const { handleError } = useContext(ErrorContext)
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      dispatch(setError(ERROR.ENTER_COMMENT))
+      handleError(ERROR.ENTER_COMMENT)
       return
     }
     try {
@@ -27,12 +27,12 @@ const AddComment: React.FC<AddCommentProps> = ({ post, socket }) => {
       })
 
       if (data?.createComment) {
-        dispatch(setAlert(ALERT.COMMENT_INSERTED))
+        handleError(ALERT.COMMENT_INSERTED)
         setNewComment('')
         socket?.emit('comment', { postId: post.id, commentId: data.createComment.id })
       }
     } catch (err) {
-      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
+      handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
 

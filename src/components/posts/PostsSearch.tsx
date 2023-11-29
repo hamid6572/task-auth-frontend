@@ -1,13 +1,12 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import { Box, InputBase, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { useLazyQuery } from '@apollo/client'
 
-import { setError } from '../../redux/actions/ErrorActions'
 import { GlobalSearchQuery } from '../../apis/posts'
 import { ERROR, ROUTE } from '../../enums'
+import { ErrorContext } from '../../context/ErrorProvider'
 
 const PostSearch: React.FC = () => {
   const [searchText, setSearchText] = useState('')
@@ -16,11 +15,10 @@ const PostSearch: React.FC = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-
+  const { handleError } = useContext(ErrorContext)
   const handleSearch = async () => {
     if (!searchText.trim()) {
-      dispatch(setError(ERROR.NONE_TO_SEARCH))
+      handleError(ERROR.NONE_TO_SEARCH)
       return
     }
 
@@ -30,13 +28,13 @@ const PostSearch: React.FC = () => {
           input: searchText
         }
       })
-      if (data?.search.length === 0) dispatch(setError(ERROR.EMPTY_DATA))
+      if (data?.search.length === 0) handleError(ERROR.EMPTY_DATA)
       else {
         setSearchResults(data.search)
         navigate('/search', { state: { results: data.search } })
       }
     } catch (error) {
-      dispatch(setError(error.message || ERROR.GLOBAL_MESSAGE))
+      handleError(ERROR.GLOBAL_MESSAGE)
     }
     if (searchResults) {
       return null

@@ -1,14 +1,12 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import { Button, Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 import { Socket, io } from 'socket.io-client'
 
-import CommentList from '../Comments/CommentList'
+import CommentList from '../comments/CommentList'
 import { GetCommentQuery, GetCommentsQuery } from '../../apis/comments'
-import AddComment from '../Comments/AddComment'
-import { setError } from '../../redux/actions/ErrorActions'
+import AddComment from '../comments/AddComment'
 import { ERROR, ROUTE } from '../../enums'
 import {
   Comment,
@@ -18,6 +16,7 @@ import {
   GetCommentsVariables,
   PostItemProps
 } from '../../types'
+import { ErrorContext } from '../../context/ErrorProvider'
 
 const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   const [comments, setComments] = useState<Comment[]>([])
@@ -33,7 +32,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   const [GetComments] = useLazyQuery<GetCommentsResponse, GetCommentsVariables>(GetCommentsQuery)
   const [GetComment] = useLazyQuery<GetCommentResponse, GetCommentVariables>(GetCommentQuery)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const { handleError } = useContext(ErrorContext)
 
   const connectSocket = () => {
     const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL || '', {
@@ -48,7 +47,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
     })
 
     newSocket.on('newComment', async (postId, commentId) => {
-      let newComment = await fetchComment(commentId)
+      const newComment = await fetchComment(commentId)
       console.log('Received new comment:', newComment)
 
       if (newComment) setComments(prevComments => [...prevComments, newComment])
@@ -83,7 +82,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
 
   const handleViewComments = async () => {
     try {
-      let data = await fetchComments()
+      const data = await fetchComments()
       if (data) {
         setComments(prevData => [...prevData, ...data])
         setShowComments(prevState => !prevState)
@@ -93,7 +92,7 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
         connectSocket()
       }
     } catch (err) {
-      dispatch(setError(err.message || ERROR.GLOBAL_MESSAGE))
+      handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
 
@@ -102,10 +101,10 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   }
 
   const handleViewMoreComments = async () => {
-    let data = await fetchComments()
+    const data = await fetchComments()
     if (data?.length === 0 || data?.length < pageSize) {
       setShowMoreComments(prevState => !prevState)
-      dispatch(setError(ERROR.NO_FURTHER_COMMENTS))
+      handleError(ERROR.NO_FURTHER_COMMENTS)
 
       setCurrentPage(1)
     }
