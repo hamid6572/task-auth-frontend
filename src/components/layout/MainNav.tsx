@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { AppBar, Toolbar, Typography, Box } from '@mui/material'
 
 import { ROUTE } from '../../enums'
-import PostSearch from '../Posts/PostsSearch'
+import PostSearch from '../posts/PostsSearch'
 
 const MainNav: React.FC = () => {
   const signoutHandler = () => {

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Layout from '../components/Layout/Layout'
+import Layout from '../components/layout/Layout'
 import Posts from './Posts'
 import { useLocation } from 'react-router-dom'
 

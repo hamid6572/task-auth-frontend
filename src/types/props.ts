@@ -8,11 +8,6 @@ export type PostItemProps = {
   deleteHandler: (id: number) => void
 }
 
-export type PostListProps = {
-  posts: Post[]
-  deleteHandler: (id: number) => void
-}
-
 export type CommentListProps = {
   comments: Comment[]
 }
@@ -42,4 +37,20 @@ export type AddCommentProps = {
 
 export type PostProps = {
   isEdit?: boolean
+}
+
+export type ErrorContextProps = {
+  error: string | null
+  handleError: (errorMessage: string) => void
+  clearError: () => void
+}
+
+export type ErrorProviderProps = {
+  children: ReactNode
+}
+
+export type PostListProps = {
+  state: {
+    post: Post
+  }
 }
