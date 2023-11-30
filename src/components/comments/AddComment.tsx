@@ -2,10 +2,10 @@ import React, { useContext, useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
-import { AddCommentMutation } from '../../apis/comments'
-import { ALERT, ERROR } from '../../enums'
-import { AddCommentProps, AddCommentResponse, AddCommentVariables } from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+import { AddCommentMutation } from 'apis/comments'
+import { ALERT, ERROR } from 'enums'
+import { AddCommentProps, AddCommentResponse, AddCommentVariables } from 'types'
+import { ErrorContext } from 'context/ErrorProvider'
 
 const AddComment: React.FC<AddCommentProps> = ({ post, socket }) => {
   const [newComment, setNewComment] = useState('')

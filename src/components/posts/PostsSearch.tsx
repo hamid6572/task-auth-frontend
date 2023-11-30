@@ -4,9 +4,9 @@ import { Box, InputBase, IconButton } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { useLazyQuery } from '@apollo/client'
 
-import { GlobalSearchQuery } from '../../apis/posts'
-import { ERROR, ROUTE } from '../../enums'
-import { ErrorContext } from '../../context/ErrorProvider'
+import { GlobalSearchQuery } from 'apis/posts'
+import { ERROR, ROUTE } from 'enums'
+import { ErrorContext } from 'context/ErrorProvider'
 
 const PostSearch: React.FC = () => {
   const [searchText, setSearchText] = useState('')
@@ -16,6 +16,7 @@ const PostSearch: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { handleError } = useContext(ErrorContext)
+
   const handleSearch = async () => {
     if (!searchText.trim()) {
       handleError(ERROR.NONE_TO_SEARCH)

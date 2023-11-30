@@ -1,6 +1,8 @@
 import React, { useContext } from 'react'
 import { useMutation } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -12,43 +14,40 @@ import {
   Paper,
   Typography
 } from '@mui/material'
-import { useForm, SubmitHandler } from 'react-hook-form'
 
-import { SignupFormValues, SignupResponse, SignupVariables } from '../../types'
-import { SignupMutation } from '../../apis/auth'
-import { ErrorContext } from '../../context/ErrorProvider'
-import { ERROR, ROUTE } from '../../enums'
+import { SignupFormValues, SignupResponse, SignupVariables } from 'types'
+import { SignupMutation } from 'apis/auth'
+import { ErrorContext } from 'context/ErrorProvider'
+import { ERROR, ROUTE } from 'enums'
+import { signupSchema } from 'validations'
 
 const SignUpComponent: React.FC = () => {
   const {
-    register,
     handleSubmit,
+    control,
     formState: { errors }
-  } = useForm<SignupFormValues>()
+  } = useForm<SignupFormValues>({ resolver: yupResolver(signupSchema) })
 
   const [registerUser] = useMutation<SignupResponse, SignupVariables>(SignupMutation)
-
   const { handleError } = useContext(ErrorContext)
   const navigate = useNavigate()
 
   const signUpHandler = async userData => {
     try {
       const { data } = await registerUser({
-        variables: {
-          ...userData
-        }
+        variables: { ...userData }
       })
 
       if (data?.register.token) {
         localStorage.setItem('token', data.register.token)
         localStorage.setItem('userId', data.register.user.id?.toString())
-
         navigate(ROUTE.DASHBOARD)
       }
     } catch (err) {
       handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
+
   const onSubmit: SubmitHandler<SignupFormValues> = data => {
     signUpHandler(data)
   }
@@ -64,11 +63,12 @@ const SignUpComponent: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='signUpFirstName'>First Name</InputLabel>
-                <OutlinedInput
-                  id='signUpFirstName'
-                  type='text'
-                  {...register('firstName', { required: 'First Name is required' })}
-                  label='First Name'
+                <Controller
+                  name='firstName'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput id='signUpFirstName' type='text' {...field} label='First Name' />
+                  )}
                 />
                 <FormHelperText error={!!errors.firstName}>
                   {errors.firstName?.message}
@@ -76,11 +76,12 @@ const SignUpComponent: React.FC = () => {
               </FormControl>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='signUpLastName'>Last Name</InputLabel>
-                <OutlinedInput
-                  id='signUpLastName'
-                  type='text'
-                  {...register('lastName', { required: 'Last Name is required' })}
-                  label='Last Name'
+                <Controller
+                  name='lastName'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput id='signUpLastName' type='text' {...field} label='Last Name' />
+                  )}
                 />
                 <FormHelperText error={!!errors.lastName}>
                   {errors.lastName?.message}
@@ -88,21 +89,28 @@ const SignUpComponent: React.FC = () => {
               </FormControl>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='signUpEmail'>Email</InputLabel>
-                <OutlinedInput
-                  id='signUpEmail'
-                  type='email'
-                  {...register('email', { required: 'Email is required' })}
-                  label='Email'
+                <Controller
+                  name='email'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput id='signUpEmail' type='email' {...field} label='Email' />
+                  )}
                 />
                 <FormHelperText error={!!errors.email}>{errors.email?.message}</FormHelperText>
               </FormControl>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='signUpPassword'>Password</InputLabel>
-                <OutlinedInput
-                  id='signUpPassword'
-                  type='password'
-                  {...register('password', { required: 'Password is required' })}
-                  label='Password'
+                <Controller
+                  name='password'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput
+                      id='signUpPassword'
+                      type='password'
+                      {...field}
+                      label='Password'
+                    />
+                  )}
                 />
                 <FormHelperText error={!!errors.password}>
                   {errors.password?.message}

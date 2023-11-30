@@ -2,18 +2,18 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Button, Typography, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 
-import { GetCommentsRepliesQuery } from '../../apis/comments'
+import { GetCommentsRepliesQuery } from 'apis/comments'
+import { ERROR } from 'enums'
+import { ErrorContext } from 'context/ErrorProvider'
 import AddReply from './AddReply'
-import { ERROR } from '../../enums'
 import {
   Reply,
   GetCommentsRepliesResponse,
   GetCommentsRepliesVariables,
   CommentItemProps
-} from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+} from 'types'
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
+const CommentItem: React.FC<CommentItemProps> = ({ comment, isSearched }) => {
   const [replies, setReplies] = useState<Reply[]>([])
   const [showReplies, setShowReplies] = useState(false)
   const [currentPage, setCurrentPage] = useState(2)
@@ -84,7 +84,9 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
           )}
         </Box>
       )}
-      <AddReply postId={comment.post?.id} commentId={comment.id} setReplies={setReplies} />
+      {!isSearched && (
+        <AddReply postId={comment.post?.id} commentId={comment.id} setReplies={setReplies} />
+      )}
     </Box>
   )
 }

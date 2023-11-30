@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm, SubmitHandler, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Button,
   FormControl,
@@ -14,20 +15,20 @@ import {
   Typography
 } from '@mui/material'
 
-import { LoginFormValues, LoginResponse, LoginVariables } from '../../types'
-import { LoginMutation } from '../../apis/auth'
-import { ErrorContext } from '../../context/ErrorProvider'
-import { ERROR, ROUTE } from '../../enums'
+import { ErrorContext } from 'context/ErrorProvider'
+import { ERROR, ROUTE } from 'enums/index'
+import { LoginFormValues, LoginResponse, LoginVariables } from 'types'
+import { loginSchema } from 'validations'
+import { LoginMutation } from 'apis/auth'
 
 const LoginComponent: React.FC = () => {
   const {
-    register,
     handleSubmit,
+    control,
     formState: { errors }
-  } = useForm<LoginFormValues>()
+  } = useForm<LoginFormValues>({ resolver: yupResolver(loginSchema) })
 
   const [loginUser] = useMutation<LoginResponse, LoginVariables>(LoginMutation)
-
   const { handleError } = useContext(ErrorContext)
   const navigate = useNavigate()
 
@@ -46,6 +47,7 @@ const LoginComponent: React.FC = () => {
       handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
+
   const onSubmit: SubmitHandler<LoginFormValues> = data => {
     signInHandler(data)
   }
@@ -61,26 +63,26 @@ const LoginComponent: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='loginEmail'>Email</InputLabel>
-                <OutlinedInput
-                  id='loginEmail'
-                  type='email'
-                  {...register('email', { required: 'Email is required' })}
-                  label='Email'
+                <Controller
+                  name='email'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput {...field} id='loginEmail' type='email' label='Email' />
+                  )}
                 />
-                <FormHelperText error={errors.email && errors.email?.type === 'required'}>
-                  {errors.email?.type === 'required' && 'Email is required'}
-                </FormHelperText>
+                <FormHelperText error={!!errors.email}>{errors.email?.message}</FormHelperText>
               </FormControl>
               <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
                 <InputLabel htmlFor='loginPassword'>Password</InputLabel>
-                <OutlinedInput
-                  id='loginPassword'
-                  type='password'
-                  {...register('password', { required: 'Password is required' })}
-                  label='Password'
+                <Controller
+                  name='password'
+                  control={control}
+                  render={({ field }) => (
+                    <OutlinedInput {...field} id='loginPassword' type='password' label='Password' />
+                  )}
                 />
-                <FormHelperText error={errors.password && errors.password?.type === 'required'}>
-                  {errors.password?.type === 'required' && 'Password is required'}
+                <FormHelperText error={!!errors.password}>
+                  {errors.password?.message}
                 </FormHelperText>
               </FormControl>
               <Button variant='contained' color='primary' fullWidth type='submit' sx={{ mt: 2 }}>

@@ -22,7 +22,7 @@ const PostSearchResults: React.FC = () => {
             <Typography variant='subtitle2' color='text.secondary' sx={{ marginTop: 1 }}>
               Posted By: {result.user.firstName}
             </Typography>
-            <CommentList comments={result.comments} />
+            <CommentList comments={result.comments} isSearched={true} />
             <Box style={{ marginTop: '1rem' }}>
               <Button variant='outlined' color='success'>
                 View Details

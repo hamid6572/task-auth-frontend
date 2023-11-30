@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useLazyQuery } from '@apollo/client'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
-  TextField,
   Button,
   Container,
   Typography,
@@ -13,9 +13,11 @@ import {
   FormHelperText
 } from '@mui/material'
 
-import Layout from '../../components/layout/Layout'
-import { ERROR, ROUTE } from '../../enums'
-import { CreatePostMutation, EditPostMutation, GetPostQuery } from '../../apis/posts'
+import Layout from 'components/layout/Layout'
+import { ERROR, ROUTE } from 'enums'
+import { CreatePostMutation, EditPostMutation, GetPostQuery } from 'apis/posts'
+import { ErrorContext } from 'context/ErrorProvider'
+import { postFormSchema } from 'validations'
 import {
   CreatePostResponse,
   CreatePostVariables,
@@ -25,17 +27,16 @@ import {
   GetPostVariables,
   Post,
   PostFormValues
-} from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+} from 'types'
 
 const PostFormComponent: React.FC = () => {
   const [post, setPost] = React.useState<Post>()
   const [isLoading, setIsLoading] = React.useState(true)
   const {
-    register,
     handleSubmit,
+    control,
     formState: { errors }
-  } = useForm<PostFormValues>()
+  } = useForm<PostFormValues>({ resolver: yupResolver(postFormSchema) })
 
   const [EditPost] = useMutation<EditPostResponse, EditPostVariables>(EditPostMutation)
   const [createPost] = useMutation<CreatePostResponse, CreatePostVariables>(CreatePostMutation)
@@ -45,28 +46,27 @@ const PostFormComponent: React.FC = () => {
   const { handleError } = useContext(ErrorContext)
   const search = window.location.search
   const id = parseInt(new URLSearchParams(search).get('id') || '')
-
   const isEdit = !!id
 
   const fetchPost = async idParams => {
     try {
       const { data, error } = await GetPost({ variables: { id: idParams } })
       if (error) throw error
-      return data?.getPost
+      return data
     } catch (err) {
       handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
 
   const createEditSubmitHandler = async (formData: PostFormValues) => {
+    let postResult: GetPostResponse = {} as GetPostResponse
     try {
       if (isEdit) {
         const { data } = await EditPost({
           variables: { id, input: { ...formData } }
         })
         if (data?.updatePost) handleError(data?.updatePost.message)
-
-        return data?.updatePost
+        postResult = (await fetchPost(data?.updatePost.id)) || ({} as GetPostResponse)
       } else {
         const { data } = await createPost({
           variables: { input: { ...formData } }
@@ -74,31 +74,28 @@ const PostFormComponent: React.FC = () => {
         if (data?.createPost) {
           handleError(data?.createPost.message)
 
-          const post = await fetchPost(data?.createPost.id)
-
-          return post
+          postResult = (await fetchPost(data?.createPost.id)) || ({} as GetPostResponse)
         }
-        return data?.createPost
       }
+
+      setTimeout(() => {
+        navigate(ROUTE.DASHBOARD, { state: { post: postResult } })
+      }, 1000)
+      return postResult
     } catch (err) {
       handleError(err.message || ERROR.GLOBAL_MESSAGE)
     }
   }
 
-  const savePostHandler = handleSubmit(async formData => {
-    const updatedPost = await createEditSubmitHandler(formData)
-    console.log('updatedPost', updatedPost)
-
-    setTimeout(() => {
-      navigate(ROUTE.DASHBOARD, { state: { post: updatedPost } })
-    }, 1000)
+  const savePostHandler = handleSubmit(formData => {
+    createEditSubmitHandler(formData)
   })
 
   useEffect(() => {
     if (isEdit) {
       fetchPost(id).then(data => {
         setIsLoading(false)
-        setPost(data)
+        setPost(data?.getPost)
       })
     } else {
       setIsLoading(false)
@@ -124,27 +121,37 @@ const PostFormComponent: React.FC = () => {
           </Typography>
           <form onSubmit={savePostHandler}>
             <FormControl fullWidth>
-              <TextField
-                id='posttitle'
-                data-testid='posttitle'
-                type='text'
-                placeholder='Title'
-                defaultValue={post?.title}
-                {...register('title', { required: 'Title is required' })}
-                className='form-control my-2'
+              <Controller
+                name='title'
+                control={control}
+                defaultValue={post?.title || ''}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type='text'
+                    placeholder='Title'
+                    className='form-control my-2'
+                    data-testid='posttitle'
+                  />
+                )}
               />
               <FormHelperText error>{errors.title?.message}</FormHelperText>
             </FormControl>
 
             <FormControl fullWidth>
-              <TextField
-                multiline
-                minRows={5}
-                maxRows={10}
-                placeholder='Content'
-                defaultValue={post?.content}
-                {...register('content', { required: 'Content is required' })}
-                className='form-control my-2'
+              <Controller
+                name='content'
+                control={control}
+                defaultValue={post?.content || ''}
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    placeholder='Content'
+                    className='form-control my-2'
+                    rows={5}
+                    cols={10}
+                  />
+                )}
               />
               <FormHelperText error>{errors.content?.message}</FormHelperText>
             </FormControl>

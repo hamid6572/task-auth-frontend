@@ -4,10 +4,11 @@ import { Button, Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import { useLazyQuery } from '@apollo/client'
 import { Socket, io } from 'socket.io-client'
 
+import { GetCommentQuery, GetCommentsQuery } from 'apis/comments'
+import { ERROR, ROUTE } from 'enums'
+import { ErrorContext } from 'context/ErrorProvider'
 import CommentList from '../comments/CommentList'
-import { GetCommentQuery, GetCommentsQuery } from '../../apis/comments'
 import AddComment from '../comments/AddComment'
-import { ERROR, ROUTE } from '../../enums'
 import {
   Comment,
   GetCommentResponse,
@@ -15,24 +16,24 @@ import {
   GetCommentsResponse,
   GetCommentsVariables,
   PostItemProps
-} from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+} from 'types'
 
-const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
+const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   const [comments, setComments] = useState<Comment[]>([])
   const [showComments, setShowComments] = useState(false)
   const [showMoreComments, setShowMoreComments] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [socket, setSocket] = useState<Socket>()
 
+  const [GetComments] = useLazyQuery<GetCommentsResponse, GetCommentsVariables>(GetCommentsQuery)
+  const [GetComment] = useLazyQuery<GetCommentResponse, GetCommentVariables>(GetCommentQuery)
+
+  const navigate = useNavigate()
+  const { handleError } = useContext(ErrorContext)
+
   const token = localStorage.getItem('token')
   const { id, title, content, user } = post
   const pageSize = 3
-
-  const [GetComments] = useLazyQuery<GetCommentsResponse, GetCommentsVariables>(GetCommentsQuery)
-  const [GetComment] = useLazyQuery<GetCommentResponse, GetCommentVariables>(GetCommentQuery)
-  const navigate = useNavigate()
-  const { handleError } = useContext(ErrorContext)
 
   const connectSocket = () => {
     const newSocket = io(process.env.REACT_APP_WEB_SOCKET_URL || '', {
@@ -170,4 +171,4 @@ const PostsItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   )
 }
 
-export default PostsItem
+export default PostItem

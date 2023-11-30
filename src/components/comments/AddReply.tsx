@@ -2,10 +2,10 @@ import React, { useContext, useState } from 'react'
 import { Button, Box, TextField } from '@mui/material'
 import { useMutation } from '@apollo/client'
 
-import { AddReplyToCommentMutation } from '../../apis/comments'
-import { ALERT, ERROR } from '../../enums'
-import { AddReplyProps, AddReplyToCommentResponse, AddReplyToCommentVariables } from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+import { AddReplyToCommentMutation } from 'apis/comments'
+import { ALERT, ERROR } from 'enums'
+import { AddReplyProps, AddReplyToCommentResponse, AddReplyToCommentVariables } from 'types'
+import { ErrorContext } from 'context/ErrorProvider'
 
 const AddReply: React.FC<AddReplyProps> = ({ postId, commentId, setReplies }) => {
   const [newReply, setNewReply] = useState('')
