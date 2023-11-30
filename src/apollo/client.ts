@@ -22,8 +22,6 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 
       switch (err.message) {
         case 'UNAUTHENTICATED':
-          console.log(err)
-
           const oldHeaders = operation.getContext().headers
           operation.setContext({
             headers: {

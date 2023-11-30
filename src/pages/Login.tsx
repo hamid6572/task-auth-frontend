@@ -1,5 +1,5 @@
 import React from 'react'
-import LoginComponent from '../components/authentication/Login'
+import LoginComponent from 'components/authentication/Login'
 
 const Login: React.FC = () => <LoginComponent />
 

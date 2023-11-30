@@ -1,7 +1,8 @@
 import { ReactNode } from 'react'
+import { Socket } from 'socket.io-client'
+
 import { Post } from './post'
 import { Comment, Reply } from './comment'
-import { Socket } from 'socket.io-client'
 
 export type PostItemProps = {
   post: Post
@@ -10,10 +11,12 @@ export type PostItemProps = {
 
 export type CommentListProps = {
   comments: Comment[]
+  isSearched?: boolean
 }
 
 export type CommentItemProps = {
   comment: Comment
+  isSearched?: boolean
 }
 
 export type AddReplyProps = {

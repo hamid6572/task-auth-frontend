@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { AppBar, Toolbar, Typography, Box } from '@mui/material'
 
-import { ROUTE } from '../../enums'
+import { ROUTE } from 'enums'
 import PostSearch from '../posts/PostsSearch'
 
 const MainNav: React.FC = () => {

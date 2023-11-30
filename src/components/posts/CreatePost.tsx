@@ -5,11 +5,11 @@ import { useMutation } from '@apollo/client'
 import { Button, Container, Typography, Box, FormControl, FormHelperText } from '@mui/material'
 import { TextField } from '@mui/material'
 
-import Layout from '../../components/layout/Layout'
-import { CreatePostMutation } from '../../apis/posts'
-import { ERROR, ROUTE } from '../../enums'
-import { CreatePostResponse, CreatePostVariables, PostFormValues } from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+import Layout from 'components/layout/Layout'
+import { CreatePostMutation } from 'apis/posts'
+import { ERROR, ROUTE } from 'enums'
+import { CreatePostResponse, CreatePostVariables, PostFormValues } from 'types'
+import { ErrorContext } from 'context/ErrorProvider'
 
 const CreatePostComponent: React.FC = () => {
   const {

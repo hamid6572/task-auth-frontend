@@ -3,17 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useLazyQuery } from '@apollo/client'
 import { TextField, Button, Container, Typography, Box, CircularProgress } from '@mui/material'
 
-import { EditPostMutation, GetPostQuery } from '../../apis/posts'
-import Layout from '../../components/layout/Layout'
-import { ERROR, ROUTE } from '../../enums'
-import {
-  EditPostResponse,
-  EditPostVariables,
-  GetPostResponse,
-  GetPostVariables,
-  Post
-} from '../../types'
-import { ErrorContext } from '../../context/ErrorProvider'
+import { EditPostMutation, GetPostQuery } from 'apis/posts'
+import Layout from 'components/layout/Layout'
+import { ERROR, ROUTE } from 'enums'
+import { EditPostResponse, EditPostVariables, GetPostResponse, GetPostVariables, Post } from 'types'
+import { ErrorContext } from 'context/ErrorProvider'
 
 const EditPostComponent: React.FC = () => {
   const [post, setPost] = useState<Post>()

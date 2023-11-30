@@ -1,5 +1,5 @@
 import React from 'react'
-import EditPostComponent from '../components/posts/EditPost'
+import EditPostComponent from 'components/posts/EditPost'
 
 const EditPost: React.FC = () => <EditPostComponent />
 
