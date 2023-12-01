@@ -5,7 +5,9 @@ import { User } from './user'
 export type SignupResponse = {
   register: {
     token: string
-    user: User
+    user: {
+      id: string
+    }
   }
 }
 

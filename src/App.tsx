@@ -4,7 +4,7 @@ import './App.css'
 import Routes from './routes/routes'
 
 import { ErrorProvider } from './context/ErrorProvider'
-import GlobalSnackbar from './components/GlobalSnackbar'
+import { GlobalSnackbar } from 'components/common'
 import ApolloClientWrapper from './apollo/ApolloClientWrapper'
 
 const App: React.FC = () => {

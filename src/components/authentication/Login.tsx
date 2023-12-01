@@ -1,23 +1,14 @@
 import React, { useContext } from 'react'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
-import { useForm, SubmitHandler, Controller } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  FormHelperText,
-  Box,
-  Container,
-  Paper,
-  Typography
-} from '@mui/material'
+import { Button, FormHelperText, Box, Container, Paper, Typography } from '@mui/material'
 
 import { ErrorContext } from 'context/ErrorProvider'
-import { ERROR, ROUTE } from 'enums/index'
+import { FIELDS, PLACEHOLDER, TEXT_TYPE, ERROR, ROUTE } from 'enums/index'
 import { LoginFormValues, LoginResponse, LoginVariables } from 'types'
+import { FormInputController } from 'components/common'
 import { loginSchema } from 'validations'
 import { LoginMutation } from 'apis/auth'
 
@@ -25,7 +16,9 @@ const LoginComponent: React.FC = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors }
+    formState: {
+      errors: { email, password }
+    }
   } = useForm<LoginFormValues>({ resolver: yupResolver(loginSchema) })
 
   const [loginUser] = useMutation<LoginResponse, LoginVariables>(LoginMutation)
@@ -37,9 +30,16 @@ const LoginComponent: React.FC = () => {
       const { data } = await loginUser({
         variables: { ...userData }
       })
-      if (data?.login.token) {
-        localStorage.setItem('token', data.login.token)
-        localStorage.setItem('userId', data.login.user.id)
+      if (data) {
+        const {
+          login: {
+            token,
+            user: { id }
+          }
+        } = data
+
+        localStorage.setItem('token', token)
+        localStorage.setItem('userId', id)
 
         navigate(ROUTE.DASHBOARD)
       }
@@ -61,30 +61,21 @@ const LoginComponent: React.FC = () => {
               Login
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='loginEmail'>Email</InputLabel>
-                <Controller
-                  name='email'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput {...field} id='loginEmail' type='email' label='Email' />
-                  )}
-                />
-                <FormHelperText error={!!errors.email}>{errors.email?.message}</FormHelperText>
-              </FormControl>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='loginPassword'>Password</InputLabel>
-                <Controller
-                  name='password'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput {...field} id='loginPassword' type='password' label='Password' />
-                  )}
-                />
-                <FormHelperText error={!!errors.password}>
-                  {errors.password?.message}
-                </FormHelperText>
-              </FormControl>
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.EMAIL}
+                name={FIELDS.EMAIL}
+                placeholder={PLACEHOLDER.EMAIL}
+              />
+              <FormHelperText error={!!email}>{email?.message}</FormHelperText>
+
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.PASSOWRD}
+                name={FIELDS.PASSOWRD}
+                placeholder={PLACEHOLDER.PASSOWRD}
+              />
+              <FormHelperText error={!!password}>{password?.message}</FormHelperText>
               <Button variant='contained' color='primary' fullWidth type='submit' sx={{ mt: 2 }}>
                 Sign In
               </Button>
