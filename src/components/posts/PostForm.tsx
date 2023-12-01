@@ -1,21 +1,13 @@
 import React, { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useMutation, useLazyQuery } from '@apollo/client'
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  Button,
-  Container,
-  Typography,
-  Box,
-  CircularProgress,
-  FormControl,
-  FormHelperText
-} from '@mui/material'
+import { Button, Container, Typography, Box, CircularProgress, FormHelperText } from '@mui/material'
 
-import Layout from 'components/layout/Layout'
-import { ERROR, ROUTE } from 'enums'
 import { CreatePostMutation, EditPostMutation, GetPostQuery } from 'apis/posts'
+import { ERROR, FIELDS, PLACEHOLDER, ROUTE, TEXT_TYPE } from 'enums'
+import { FormInputController, Layout } from 'components/common'
 import { ErrorContext } from 'context/ErrorProvider'
 import { postFormSchema } from 'validations'
 import {
@@ -35,7 +27,9 @@ const PostFormComponent: React.FC = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors }
+    formState: {
+      errors: { title, content }
+    }
   } = useForm<PostFormValues>({ resolver: yupResolver(postFormSchema) })
 
   const [EditPost] = useMutation<EditPostResponse, EditPostVariables>(EditPostMutation)
@@ -120,41 +114,24 @@ const PostFormComponent: React.FC = () => {
             {isEdit ? 'Edit post' : 'Create post'}
           </Typography>
           <form onSubmit={savePostHandler}>
-            <FormControl fullWidth>
-              <Controller
-                name='title'
-                control={control}
-                defaultValue={post?.title || ''}
-                render={({ field }) => (
-                  <input
-                    {...field}
-                    type='text'
-                    placeholder='Title'
-                    className='form-control my-2'
-                    data-testid='posttitle'
-                  />
-                )}
-              />
-              <FormHelperText error>{errors.title?.message}</FormHelperText>
-            </FormControl>
+            <FormInputController
+              control={control}
+              defaultValue={post?.title || ''}
+              type={TEXT_TYPE.TEXT}
+              name={FIELDS.TITLE}
+              placeholder={PLACEHOLDER.TITLE}
+            />
+            <FormHelperText error={!!title}>{title?.message}</FormHelperText>
 
-            <FormControl fullWidth>
-              <Controller
-                name='content'
-                control={control}
-                defaultValue={post?.content || ''}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    placeholder='Content'
-                    className='form-control my-2'
-                    rows={5}
-                    cols={10}
-                  />
-                )}
-              />
-              <FormHelperText error>{errors.content?.message}</FormHelperText>
-            </FormControl>
+            <FormInputController
+              control={control}
+              defaultValue={post?.content || ''}
+              type={TEXT_TYPE.TEXT}
+              name={FIELDS.CONTENT}
+              placeholder={PLACEHOLDER.CONTENT}
+              rows={5}
+            />
+            <FormHelperText error={!!content}>{content?.message}</FormHelperText>
             <Box mt={2} className='form-group'>
               <Button
                 data-testid={isEdit ? 'editbutton' : 'postbutton'}

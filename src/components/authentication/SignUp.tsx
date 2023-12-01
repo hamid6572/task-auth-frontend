@@ -2,30 +2,23 @@ import React, { useContext } from 'react'
 import { useMutation } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  FormHelperText,
-  Box,
-  Container,
-  Paper,
-  Typography
-} from '@mui/material'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { Button, FormHelperText, Box, Container, Paper, Typography } from '@mui/material'
 
+import { FIELDS, PLACEHOLDER, TEXT_TYPE, ERROR, ROUTE } from 'enums'
 import { SignupFormValues, SignupResponse, SignupVariables } from 'types'
-import { SignupMutation } from 'apis/auth'
+import { FormInputController } from 'components/common'
 import { ErrorContext } from 'context/ErrorProvider'
-import { ERROR, ROUTE } from 'enums'
+import { SignupMutation } from 'apis/auth'
 import { signupSchema } from 'validations'
 
 const SignUpComponent: React.FC = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors }
+    formState: {
+      errors: { email, password, firstName, lastName }
+    }
   } = useForm<SignupFormValues>({ resolver: yupResolver(signupSchema) })
 
   const [registerUser] = useMutation<SignupResponse, SignupVariables>(SignupMutation)
@@ -38,9 +31,17 @@ const SignUpComponent: React.FC = () => {
         variables: { ...userData }
       })
 
-      if (data?.register.token) {
-        localStorage.setItem('token', data.register.token)
-        localStorage.setItem('userId', data.register.user.id?.toString())
+      if (data) {
+        const {
+          register: {
+            token,
+            user: { id }
+          }
+        } = data
+
+        localStorage.setItem('token', token)
+        localStorage.setItem('userId', id)
+
         navigate(ROUTE.DASHBOARD)
       }
     } catch (err) {
@@ -61,61 +62,38 @@ const SignUpComponent: React.FC = () => {
               Sign Up
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='signUpFirstName'>First Name</InputLabel>
-                <Controller
-                  name='firstName'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput id='signUpFirstName' type='text' {...field} label='First Name' />
-                  )}
-                />
-                <FormHelperText error={!!errors.firstName}>
-                  {errors.firstName?.message}
-                </FormHelperText>
-              </FormControl>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='signUpLastName'>Last Name</InputLabel>
-                <Controller
-                  name='lastName'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput id='signUpLastName' type='text' {...field} label='Last Name' />
-                  )}
-                />
-                <FormHelperText error={!!errors.lastName}>
-                  {errors.lastName?.message}
-                </FormHelperText>
-              </FormControl>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='signUpEmail'>Email</InputLabel>
-                <Controller
-                  name='email'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput id='signUpEmail' type='email' {...field} label='Email' />
-                  )}
-                />
-                <FormHelperText error={!!errors.email}>{errors.email?.message}</FormHelperText>
-              </FormControl>
-              <FormControl sx={{ width: 400 }} variant='outlined' margin='normal'>
-                <InputLabel htmlFor='signUpPassword'>Password</InputLabel>
-                <Controller
-                  name='password'
-                  control={control}
-                  render={({ field }) => (
-                    <OutlinedInput
-                      id='signUpPassword'
-                      type='password'
-                      {...field}
-                      label='Password'
-                    />
-                  )}
-                />
-                <FormHelperText error={!!errors.password}>
-                  {errors.password?.message}
-                </FormHelperText>
-              </FormControl>
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.TEXT}
+                name={FIELDS.FIRST_NAME}
+                placeholder={PLACEHOLDER.FIRST_NAME}
+              />
+              <FormHelperText error={!!firstName}>{firstName?.message}</FormHelperText>
+
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.TEXT}
+                name={FIELDS.LAST_NAME}
+                placeholder={PLACEHOLDER.LAST_NAME}
+              />
+              <FormHelperText error={!!lastName}>{lastName?.message}</FormHelperText>
+
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.EMAIL}
+                name={FIELDS.EMAIL}
+                placeholder={PLACEHOLDER.EMAIL}
+              />
+              <FormHelperText error={!!email}>{email?.message}</FormHelperText>
+
+              <FormInputController
+                control={control}
+                type={TEXT_TYPE.PASSOWRD}
+                name={FIELDS.PASSOWRD}
+                placeholder={PLACEHOLDER.PASSOWRD}
+              />
+              <FormHelperText error={!!password}>{password?.message}</FormHelperText>
+
               <Button variant='contained' color='primary' fullWidth type='submit' sx={{ mt: 2 }}>
                 Sign Up
               </Button>

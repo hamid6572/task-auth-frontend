@@ -5,7 +5,7 @@ import { debounce } from 'lodash'
 
 import { DeletePostMutation, GetPaginatedPostsQuery } from 'apis/posts'
 import { ErrorContext } from 'context/ErrorProvider'
-import Layout from '../layout/Layout'
+import Layout from 'components/common/Layout'
 import PostItem from './PostItem'
 import { ERROR } from 'enums'
 import {

@@ -32,7 +32,12 @@ const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   const { handleError } = useContext(ErrorContext)
 
   const token = localStorage.getItem('token')
-  const { id, title, content, user } = post
+  const {
+    id,
+    title,
+    content,
+    user: { id: userId, firstName }
+  } = post
   const pageSize = 3
 
   const connectSocket = () => {
@@ -127,10 +132,10 @@ const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
             </Typography>
 
             <Typography variant='subtitle2' color='text.secondary' sx={{ marginTop: 1 }}>
-              Posted By: {user?.firstName}
+              Posted By: {firstName}
             </Typography>
 
-            {user?.id?.toString() === localStorage.getItem('userId') && (
+            {userId?.toString() === localStorage.getItem('userId') && (
               <Box style={{ marginTop: '1rem' }}>
                 <Button variant='outlined' color='success' onClick={editHandler}>
                   Edit

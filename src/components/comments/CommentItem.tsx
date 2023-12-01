@@ -24,6 +24,13 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, isSearched }) => {
     GetCommentsRepliesVariables
   >(GetCommentsRepliesQuery)
   const { handleError } = useContext(ErrorContext)
+  const {
+    id,
+    text,
+    user: { firstName },
+    post: { id: postId },
+    replies: commentReplies
+  } = comment
 
   useEffect(() => {
     if (comment.replies) {
@@ -62,14 +69,14 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, isSearched }) => {
   }
 
   return (
-    <Box key={comment.id} sx={{ marginLeft: 2 }}>
+    <Box key={id} sx={{ marginLeft: 2 }}>
       <Typography variant='subtitle2' color='text.secondary' sx={{ marginTop: 1 }}>
-        {comment.user?.firstName}
+        {firstName}
       </Typography>
       <Typography variant='body1' gutterBottom>
-        {comment.text}, {comment.id}
+        {text}, {id}
       </Typography>
-      {comment?.replies?.length >= 0 && (
+      {commentReplies?.length >= 0 && (
         <Box>
           {replies.map(reply => (
             <Typography key={reply.id} color='textSecondary' sx={{ marginLeft: 4 }}>
@@ -84,9 +91,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, isSearched }) => {
           )}
         </Box>
       )}
-      {!isSearched && (
-        <AddReply postId={comment.post?.id} commentId={comment.id} setReplies={setReplies} />
-      )}
+      {!isSearched && <AddReply postId={postId} commentId={id} setReplies={setReplies} />}
     </Box>
   )
 }
