@@ -29,8 +29,6 @@ const ApolloClientWrapper: FC<ApolloWrapperProps> = ({ children }) => {
     if (graphQLErrors) {
       graphQLErrors.forEach(({ message, extensions }) => {
         handleError(`GraphQL Error: ${message}`)
-
-        console.log('extensions>>>>>>>>>>>>>>>>>', extensions)
       })
     }
 

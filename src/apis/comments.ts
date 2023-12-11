@@ -1,13 +1,5 @@
 import { gql } from '@apollo/client'
 
-export const CreatePostMutation = gql`
-  mutation CreatePost($input: PostInput!) {
-    createPost(data: $input) {
-      message
-    }
-  }
-`
-
 export const GetCommentsQuery = gql`
   query GetComment($postId: Int!, $page: Int!, $itemsPerPage: Int!) {
     getComment(postId: $postId, page: $page, itemsPerPage: $itemsPerPage) {

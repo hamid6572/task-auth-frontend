@@ -11,6 +11,8 @@ const FormInputController = <TFieldValues extends FieldValues = FieldValues>({
   placeholder,
   rows
 }: FormInputControllerProps<TFieldValues>) => {
+  console.log(type)
+
   return (
     <Box>
       <FormControl sx={{ width: 400 }} variant='outlined' margin='normal' fullWidth>
@@ -23,6 +25,11 @@ const FormInputController = <TFieldValues extends FieldValues = FieldValues>({
               {...field}
               id={name}
               type={type}
+              InputProps={{
+                inputProps: {
+                  type: { type }
+                }
+              }}
               placeholder={placeholder}
               className='form-control'
               multiline
