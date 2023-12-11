@@ -1,5 +1,5 @@
 {
-  "name": "project2-blogsite",
+  "name": "task-auth-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -41,7 +41,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate": "graphql-codegen"
   },
   "eslintConfig": {
     "extends": [
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
     "eslint": "^8.54.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
