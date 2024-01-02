@@ -59,6 +59,10 @@ const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
       if (newComment) setComments(prevComments => [...prevComments, newComment])
     })
 
+    newSocket.on('newCommentNotify', async message => {
+      handleError(message)
+    })
+
     newSocket.on('disconnect', () => {
       console.log('Disconnected from the WebSocket server')
     })

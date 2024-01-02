@@ -1,6 +1,6 @@
-FROM node:18-alpine
+FROM task-auth-backend-main_app
 
-WORKDIR /app
+WORKDIR /frontend
 COPY . .
 RUN npm install
 

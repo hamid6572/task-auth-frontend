@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./
+    environment:
+      - REACT_APP_GRAPHQL_ENDPOINT=$REACT_APP_GRAPHQL_ENDPOINT
+    ports:
+      - '8080:3000'
