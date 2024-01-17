@@ -55,18 +55,21 @@ export type DeletePostResponse = {
 
 export type PaginatedPostsResponse = {
   paginatedPosts: {
-    id: number
-    title: string
-    content: string
-    user: {
+    posts: {
       id: number
-      firstName: string
-    }
-    comments: {
-      id: number
-      text: string
+      title: string
+      content: string
+      user: {
+        id: number
+        firstName: string
+      }
+      comments: {
+        id: number
+        text: string
+      }[]
     }[]
-  }[]
+    total: number
+  }
 }
 
 type GenericComment = {

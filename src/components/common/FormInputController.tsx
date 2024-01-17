@@ -3,7 +3,7 @@ import { Controller, FieldValues } from 'react-hook-form'
 import { FormControl, Box, TextField } from '@mui/material'
 import { FormInputControllerProps } from 'types/formInputs'
 
-const FormInputController = <TFieldValues extends FieldValues = FieldValues>({
+const FormInputController = <TFieldValues extends FieldValues>({
   control,
   name,
   defaultValue,
