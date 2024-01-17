@@ -30,34 +30,36 @@ const PostList: React.FC<PostListProps> = ({ state }) => {
   const [DeletePost] = useMutation<DeletePostResponse, DeletePostVariables>(DeletePostMutation)
 
   const { handleError } = useContext(ErrorContext)
-  const pageSize = 4
+  const pageSize = 3
 
   const fetchData = async () => {
     const { data } = await getPaginatedPosts({
       variables: {
         itemsPerPage: pageSize,
-        page: (currentPage - 1) * pageSize
+        page: currentPage
       }
     })
 
     return (
       data || {
-        paginatedPosts: []
+        paginatedPosts: {
+          posts: []
+        }
       }
     ).paginatedPosts
   }
 
   const handleViewPosts = async () => {
     try {
-      const data = await fetchData()
-      if (data?.length === 0 || data?.length < pageSize) {
+      const { posts } = await fetchData()
+      if (posts.length === 0 || posts.length < pageSize) {
         handleError(ERROR.NO_FURTHER_POSTS)
         setIsLoadingPagination(false)
         setCurrentPage(1)
         setAllPostsFetched(true)
       }
 
-      setPosts(prevData => [...prevData, ...data])
+      setPosts(prevData => [...prevData, ...posts])
       setCurrentPage(currentPage + 1)
     } catch (err) {
       handleError(err.message || ERROR.GLOBAL_MESSAGE)
@@ -82,11 +84,11 @@ const PostList: React.FC<PostListProps> = ({ state }) => {
   }, [handleScroll, allPostsFetched, state?.post?.title, state?.post?.id])
 
   const fetch = async () => {
-    const data = await fetchData()
+    const { posts } = await fetchData()
     setIsLoading(false)
-    if (data?.length !== 0 && data?.length >= pageSize) setIsLoadingPagination(true)
+    if (posts?.length !== 0 && posts.length >= pageSize) setIsLoadingPagination(true)
 
-    setPosts(prevData => [...prevData, ...data])
+    setPosts(prevData => [...prevData, ...posts])
   }
 
   useEffect(() => {

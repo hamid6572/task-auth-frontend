@@ -23,8 +23,8 @@ export const LoginMutation = gql`
   }
 `
 export const UserQuery = gql`
-  query GetUser($email: String!) {
-    user(email: $email) {
+  query GetUser($id: Int!) {
+    user(id: $id) {
       firstName
       posts {
         title

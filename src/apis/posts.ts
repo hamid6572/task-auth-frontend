@@ -29,17 +29,21 @@ export const GetPostsQuery = gql`
 export const GetPaginatedPostsQuery = gql`
   query PaginatedPosts($page: Int!, $itemsPerPage: Int!) {
     paginatedPosts(page: $page, itemsPerPage: $itemsPerPage) {
-      id
-      title
-      content
-      user {
+      posts {
+        user {
+          lastName
+          firstName
+          id
+        }
+        title
+        content
         id
-        firstName
+        comments {
+          id
+          text
+        }
       }
-      comments {
-        id
-        text
-      }
+      total
     }
   }
 `
