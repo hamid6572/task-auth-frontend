@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    working_dir: /app
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - $PORT:$PORT
+    volumes:
+      - .:/app
