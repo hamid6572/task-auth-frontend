@@ -80,17 +80,23 @@ const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
       variables: {
         postId: id,
         itemsPerPage: pageSize,
-        page: (currentPage - 1) * pageSize
+        page: pageSize
       }
     })
-    return data?.getComment || []
+    return (
+      data || {
+        getComment: {
+          comments: []
+        }
+      }
+    ).getComment
   }
 
   const handleViewComments = async () => {
     try {
-      const data = await fetchComments()
-      if (data) {
-        setComments(prevData => [...prevData, ...data])
+      const { comments } = await fetchComments()
+      if (comments) {
+        setComments(prevData => [...prevData, ...comments])
         setShowComments(prevState => !prevState)
         setShowMoreComments(prevState => !prevState)
 
@@ -107,14 +113,14 @@ const PostItem: React.FC<PostItemProps> = ({ post, deleteHandler }) => {
   }
 
   const handleViewMoreComments = async () => {
-    const data = await fetchComments()
-    if (data?.length === 0 || data?.length < pageSize) {
+    const { comments } = await fetchComments()
+    if (comments?.length === 0 || comments?.length < pageSize) {
       setShowMoreComments(prevState => !prevState)
       handleError(ERROR.NO_FURTHER_COMMENTS)
 
       setCurrentPage(1)
     }
-    setComments(prevData => [...prevData, ...data])
+    setComments(prevData => [...prevData, ...comments])
     setCurrentPage(currentPage + 1)
   }
 

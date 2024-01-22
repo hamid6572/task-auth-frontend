@@ -81,7 +81,8 @@ type GenericComment = {
 }
 
 export type GetCommentsResponse = {
-  getComment: GenericComment[]
+  getComment: { comments: GenericComment[] }
+  total: number
 }
 
 export type GetCommentResponse = {
