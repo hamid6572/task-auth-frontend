@@ -3,24 +3,27 @@ import { gql } from '@apollo/client'
 export const GetCommentsQuery = gql`
   query GetComment($postId: Int!, $page: Int!, $itemsPerPage: Int!) {
     getComment(postId: $postId, page: $page, itemsPerPage: $itemsPerPage) {
-      id
-      text
-      user {
-        firstName
-      }
-      post {
-        id
-        title
-        content
-      }
-      replies {
+      comments {
         id
         text
+        user {
+          firstName
+        }
+        post {
+          id
+          title
+          content
+        }
         replies {
           id
           text
+          replies {
+            id
+            text
+          }
         }
       }
+      total
     }
   }
 `
