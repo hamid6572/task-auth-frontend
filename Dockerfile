@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM task-auth-backend-main-app
 
 WORKDIR /app
 COPY . .
